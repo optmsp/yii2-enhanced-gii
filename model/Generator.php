@@ -457,8 +457,14 @@ class Generator extends BaseGenerator {
                 case Schema::TYPE_DATETIME:
                 case Schema::TYPE_TIMESTAMP:
                     $types['safe'][] = $column->name;
-                    break;
-                default: // strings
+		    break;
+		case Schema::TYPE_TINYINT:
+		    echo "default.. column: " . $column->name . "\n";
+		    echo "type: " . $column->type . "\n";
+                    $types['boolean'][] = $column->name;
+		    break;
+		default: // strings
+
                     if ($column->size > 0) {
                         $lengths[$column->size][] = $column->name;
                     } else {

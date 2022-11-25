@@ -55,12 +55,14 @@ class <?= $className ?> extends <?= ($isTree) ? '\kartik\tree\models\Tree' . "\n
     public function __construct(){
         parent::__construct();
         $this->_rt_softdelete = [
+            'is_deleted' => 1,
             '<?= $generator->deletedBy ?>' => <?= (empty($generator->deletedByValue)) ? 1 : $generator->deletedByValue ?>,
 <?php if($generator->deletedAt): ?>
             '<?= $generator->deletedAt ?>' => <?= (empty($generator->deletedAtValue)) ? 1 : $generator->deletedAtValue ?>,
 <?php endif; ?>
         ];
         $this->_rt_softrestore = [
+            'is_deleted' => 0,
             '<?= $generator->deletedBy ?>' => <?= (empty($generator->deletedByValueRestored)) ? 0 : $generator->deletedByValueRestored ?>,
 <?php if($generator->deletedAt): ?>
             '<?= $generator->deletedAt ?>' => <?= (empty($generator->deletedAtValueRestored)) ? 0 : $generator->deletedAtValueRestored ?>,
@@ -239,7 +241,8 @@ class <?= $className ?> extends <?= ($isTree) ? '\kartik\tree\models\Tree' . "\n
     {
 <?php if($generator->deletedBy): ?>
         $query = new <?= $queryClassFullName ?>(get_called_class());
-        return $query->where(['<?= $tableName ?>.<?= $generator->deletedBy ?>' => <?= $generator->deletedByValueRestored ?>]);
+        //return $query->where(['<?= $tableName ?>.<?= $generator->deletedBy ?>' => <?= $generator->deletedByValueRestored ?>]);
+        return $query->where(['<?= $tableName ?>.is_deleted' => <?= 0 ?>]);
 <?php else: ?>
         return new <?= $queryClassFullName ?>(get_called_class());
 <?php endif; ?>
