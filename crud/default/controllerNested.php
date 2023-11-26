@@ -12,35 +12,40 @@ $controllerClass = StringHelper::basename($generator->controllerClass);
 $modelClass = StringHelper::basename($generator->modelClass);
 $searchModelClass = StringHelper::basename($generator->searchModelClass);
 if ($modelClass === $searchModelClass) {
-    $searchModelAlias = $searchModelClass . 'Search';
+    $searchModelAlias = $searchModelClass . "Search";
 }
 $pks = $generator->tableSchema->primaryKey;
 $urlParams = $generator->generateUrlParams();
 $actionParams = $generator->generateActionParams();
 $actionParamComments = $generator->generateActionParamComments();
-$skippedRelations = array_map(function($value){
+$skippedRelations = array_map(function ($value) {
     return "'$value'";
-},$generator->skippedRelations);
+}, $generator->skippedRelations);
 echo "<?php\n";
 ?>
 
-namespace <?= StringHelper::dirname(ltrim($generator->controllerClass, '\\')) ?>;
+namespace <?= StringHelper::dirname(
+    ltrim($generator->controllerClass, "\\")
+) ?>;
 
 use Yii;
-use <?= ltrim($generator->modelClass, '\\') ?>;
+use <?= ltrim($generator->modelClass, "\\") ?>;
 <?php if (!empty($generator->searchModelClass)): ?>
-use <?= ltrim($generator->searchModelClass, '\\') . (isset($searchModelAlias) ? " as $searchModelAlias" : "") ?>;
-<?php else : ?>
+use <?= ltrim($generator->searchModelClass, "\\") .
+    (isset($searchModelAlias) ? " as $searchModelAlias" : "") ?>;
+<?php else: ?>
 use yii\data\ActiveDataProvider;
 <?php endif; ?>
-use <?= ltrim($generator->baseControllerClass, '\\') ?>;
+use <?= ltrim($generator->baseControllerClass, "\\") ?>;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * <?= $controllerClass ?> implements the CRUD actions for <?= $modelClass ?> model.
  */
-class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->baseControllerClass) . "\n" ?>
+class <?= $controllerClass ?> extends <?= StringHelper::basename(
+     $generator->baseControllerClass
+ ) . "\n" ?>
 {
     public function behaviors()
     {
@@ -52,25 +57,33 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
                 ],
             ],
 <?php if ($generator->loggedUserOnly):
-    $actions = ["'index'", "'view'", "'create'", "'update'","'delete'"];
-    if($generator->pdf){
-        array_push($actions,"'pdf'");
+
+    $actions = ["'index'", "'view'", "'create'", "'update'", "'delete'"];
+    if ($generator->pdf) {
+        array_push($actions, "'pdf'");
     }
-    if($generator->saveAsNew){
-        array_push($actions,"'save-as-new'");
+    if ($generator->saveAsNew) {
+        array_push($actions, "'save-as-new'");
     }
-    foreach ($relations as $name => $rel){
-        if ($rel[2] && isset($rel[3]) && !in_array($name, $generator->skippedRelations)){
-            array_push($actions,"'".\yii\helpers\Inflector::camel2id('add'.$rel[1])."'");
+    foreach ($relations as $name => $rel) {
+        if (
+            $rel[2] &&
+            isset($rel[3]) &&
+            !in_array($name, $generator->skippedRelations)
+        ) {
+            array_push(
+                $actions,
+                "'" . \yii\helpers\Inflector::camel2id("add" . $rel[1]) . "'"
+            );
         }
     }
-?>
+    ?>
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => [<?= implode(', ',$actions)?>],
+                        'actions' => [<?= implode(", ", $actions) ?>],
                         'roles' => ['@']
                     ],
                     [
@@ -78,7 +91,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
                     ]
                 ]
             ]
-<?php endif; ?>
+<?php
+endif; ?>
         ];
     }
 
@@ -89,14 +103,16 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public function actionIndex()
     {
 <?php if (!empty($generator->searchModelClass)): ?>
-        $searchModel = new <?= isset($searchModelAlias) ? $searchModelAlias : $searchModelClass ?>();
+        $searchModel = new <?= isset($searchModelAlias)
+            ? $searchModelAlias
+            : $searchModelClass ?>();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
-<?php else : ?>
+<?php else: ?>
         $dataProvider = new ActiveDataProvider([
             'query' => <?= $modelClass ?>::find(),
         ]);

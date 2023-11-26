@@ -3,16 +3,28 @@
 use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
 
+use mootensai\enhancedgii\crud\Generator;
+
 /* @var $this yii\web\View */
 /* @var $generator \mootensai\enhancedgii\crud\Generator */
 /* @var $relations array */
 /* @var $relName string */
 
 //print_r($relations);
-$tableSchema = $generator->getDbConnection()->getTableSchema($relations[$generator::REL_TABLE]);
+$tableSchema = $generator
+    ->getDbConnection()
+    ->getTableSchema($relations[$generator::REL_TABLE]);
 $fk = $generator->generateFK($tableSchema);
 echo "<?php\n";
 ?>
+
+/**
+ * CREATED BY A CODE GENERATOR!!!!
+ * THIS FILE WAS CREATED BY A HEAVILY MODIFIED yii2-enhanced-gii for use in GRS.
+ * Hand editing this file will result in lost code.
+ *
+ * _formrefone.php
+ */
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -21,12 +33,17 @@ use yii\widgets\ActiveForm;
 ?>
 
 /* @var $this yii\web\View */
-/* @var $model <?= ltrim($generator->nsModel, '\\').'\\'.$relations[$generator::REL_CLASS] ?> */
+/* @var $model <?= ltrim($generator->nsModel, "\\") .
+    "\\" .
+    $relations[$generator::REL_CLASS] ?> */
 /* @var $form yii\widgets\ActiveForm */
 
 <?php
-$pk = empty($generator->tableSchema->primaryKey) ? $generator->tableSchema->getColumnNames()[0] : $generator->tableSchema->primaryKey[0];
+$pk = empty($generator->tableSchema->primaryKey)
+    ? $generator->tableSchema->getColumnNames()[0]
+    : $generator->tableSchema->primaryKey[0];
 $modelClass = StringHelper::basename($generator->modelClass);
+
 //foreach ($relations as $name => $rel) {
 //    $relID = Inflector::camel2id($rel[1]);
 //    if ($rel[2] && isset($rel[3]) && !in_array($name, $generator->skippedRelations)) {
@@ -43,13 +60,23 @@ $modelClass = StringHelper::basename($generator->modelClass);
 ?>
 ?>
 
-<div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-form">
+<div class="<?= Inflector::camel2id(
+    StringHelper::basename($generator->modelClass)
+) ?>-form">
 
-<?php
-foreach ($tableSchema->getColumnNames() as $attribute) {
-    if (!in_array($attribute, $generator->skippedColumns) && !in_array($attribute, array_keys($fk))) {
-        echo "    <?= " . $generator->generateActiveField($attribute, $fk, $tableSchema, $relations) . " ?>\n\n";
+<?php foreach ($tableSchema->getColumnNames() as $attribute) {
+    if (
+        !in_array($attribute, $generator->skippedColumns) &&
+        !in_array($attribute, array_keys($fk))
+    ) {
+        echo "    <?= " .
+            $generator->generateActiveField(
+                $attribute,
+                $fk,
+                $tableSchema,
+                $relations
+            ) .
+            " ?>\n\n";
     }
-}
-?>
+} ?>
 </div>

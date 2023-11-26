@@ -1,7 +1,7 @@
 <?php
 /**
-     * This is the template for generating the ActiveQuery class.
-     */
+ * This is the template for generating the ActiveQuery class.
+ */
 
 /* @var $this yii\web\View */
 /* @var $generator mootensai\enhancedgii\crud\Generator */
@@ -10,7 +10,8 @@
 
 $modelFullClassName = $modelClassName;
 if ($generator->nsModel !== $generator->queryNs) {
-    $modelFullClassName = '\\' . $generator->queryNs . '\\' . $modelFullClassName;
+    $modelFullClassName =
+        "\\" . $generator->queryNs . "\\" . $modelFullClassName;
 }
 
 echo "<?php\n";
@@ -23,14 +24,10 @@ namespace <?= $generator->queryNs ?>;
  *
  * @see <?= $modelFullClassName . "\n" ?>
  */
-class <?= $className ?> extends <?= '\\' . ltrim($generator->queryBaseClass, '\\') . "\n" ?>
+class <?= $className ?> extends <?= "\\" .
+     ltrim($generator->queryBaseClass, "\\") .
+     "\n" ?>
 {
-    /*public function active()
-    {
-        $this->andWhere('[[status]]=1');
-        return $this;
-    }*/
-
     /**
      * @inheritdoc
      * @return <?= $modelFullClassName ?>[]|array

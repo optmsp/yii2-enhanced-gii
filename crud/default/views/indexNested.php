@@ -3,6 +3,8 @@
 use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
 
+use mootensai\enhancedgii\crud\Generator;
+
 /* @var $this yii\web\View */
 /* @var $generator \mootensai\enhancedgii\crud\Generator */
 
@@ -15,21 +17,33 @@ $fk = $generator->generateFK($tableSchema);
 $modelClass = StringHelper::basename($generator->modelClass);
 $searchModelClass = StringHelper::basename($generator->searchModelClass);
 if ($modelClass === $searchModelClass) {
-    $searchModelAlias = $searchModelClass . 'Search';
+    $searchModelAlias = $searchModelClass . "Search";
 }
 ?>
 <?= "<?php" ?>
 
 /* @var $this yii\web\View */
 
+/**
+ * CREATED BY A CODE GENERATOR!!!!
+ * THIS FILE WAS CREATED BY A HEAVILY MODIFIED yii2-enhanced-gii for use in GRS.
+ * Hand editing this file will result in lost code.
+ *
+ * indexNested.php
+ */
+
 use yii\helpers\Html;
-use <?= ltrim($generator->modelClass, '\\') ?>;
+use <?= ltrim($generator->modelClass, "\\") ?>;
 use kartik\tree\TreeView;
 use kartik\tree\Module;
 use yii\web\View;
 
 
-$this->title = <?= ($generator->pluralize) ? $generator->generateString(Inflector::pluralize(Inflector::camel2words($baseModelClass))) : $generator->generateString(Inflector::camel2words($baseModelClass)) ?>;
+$this->title = <?= $generator->pluralize
+    ? $generator->generateString(
+        Inflector::pluralize(Inflector::camel2words($baseModelClass))
+    )
+    : $generator->generateString(Inflector::camel2words($baseModelClass)) ?>;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="<?= $id ?>-index">
@@ -38,8 +52,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= "<?php\n" ?>
     echo TreeView::widget([
-        'query' => <?= $baseModelClass?>::find()->addOrderBy('root, lft'),
-        'headingOptions' => ['label' => '<?= Inflector::humanize($baseModelClass) ?>'],
+        'query' => <?= $baseModelClass ?>::find()->addOrderBy('root, lft'),
+        'headingOptions' => ['label' => '<?= Inflector::humanize(
+            $baseModelClass
+        ) ?>'],
         'rootOptions' => ['label' => '<span class="text-primary">Root</span>'],
         'fontAwesome' => false,
         'isAdmin' => true, // @TODO : put your isAdmin getter here
