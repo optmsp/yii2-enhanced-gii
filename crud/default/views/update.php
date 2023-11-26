@@ -25,40 +25,24 @@ use yii\helpers\Inflector;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model <?= ltrim($generator->modelClass, "\\") ?> */
+/* @var $model <?= ltrim($generator->modelClass, '\\') ?> */
 
 $isManyEdit = (isset($hasManyEditClass) ? true : false);
 
 if (! $isManyEdit) {
-    $this->title = <?= $generator->generateString("Edit {modelClass}: ", [
-        "modelClass" => Inflector::camel2words(
-            StringHelper::basename($generator->modelClass)
-        ),
-    ]) ?> . ' ' . $model-><?= $generator->getNameAttribute() ?>;
+    $this->title = <?= $generator->generateString('Edit {modelClass}: ', ['modelClass' => Inflector::camel2words(StringHelper::basename($generator->modelClass))]) ?> . ' ' . $model-><?= $generator->getNameAttribute() ?>;
 }
 else {
     $this->title = 'Edit ' . Inflector::camel2words(Inflector::pluralize($hasManyEditClass));
 }
-$this->params['breadcrumbs'][] = ['label' => <?= $generator->pluralize
-    ? $generator->generateString(
-        Inflector::pluralize(
-            Inflector::camel2words(
-                StringHelper::basename($generator->modelClass)
-            )
-        )
-    )
-    : $generator->generateString(
-        Inflector::camel2words(StringHelper::basename($generator->modelClass))
-    ) ?>, 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => <?= ($generator->pluralize) ? $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) : $generator->generateString(Inflector::camel2words(StringHelper::basename($generator->modelClass))) ?>, 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model-><?= $generator->getNameAttribute() ?>, 'url' => ['view', <?= $urlParams ?>]];
 if ($isManyEdit) {
     $this->params['breadcrumbs'][] = Inflector::camel2words(Inflector::pluralize($hasManyEditClass));
 }
-$this->params['breadcrumbs'][] = <?= $generator->generateString("Edit") ?>;
+$this->params['breadcrumbs'][] = <?= $generator->generateString('Edit') ?>;
 ?>
-<div class="<?= Inflector::camel2id(
-    StringHelper::basename($generator->modelClass)
-) ?>-update">
+<div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-update">
 
 <?php
 echo "<?php\n";
@@ -69,7 +53,8 @@ foreach ($generator->skippedColumnsInUpdate as $colName) {
 echo "\t" . "?>\n";
 ?>
 
-<?= "<?php " ?>
+<?=
+"<?php " ?>
 
 if ($isManyEdit) {
     echo $this->render('_form', [

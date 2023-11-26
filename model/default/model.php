@@ -14,7 +14,8 @@
 /* @var $labels string[] list of attribute labels (name => label) */
 /* @var $rules string[] list of validation rules */
 /* @var $relations array list of relations (name => relation declaration) */
-echo "<?php\n"; ?>
+echo "<?php\n";
+ ?>
 
 // phpcs:disable Generic.Files.LineLength
 
@@ -32,9 +33,7 @@ use common\components\activerecord\behaviors\UUIDBehavior;
 <?php endif; ?>
 
 /**
-* This is the base model class for table "<?= $generator->generateTableName(
-    $tableName
-) ?>".
+* This is the base model class for table "<?= $generator->generateTableName($tableName) ?>".
 *
 <?php foreach ($tableSchema->columns as $column): ?>
 * @property <?= "{$column->phpType} \${$column->name}\n" ?>
@@ -43,23 +42,23 @@ use common\components\activerecord\behaviors\UUIDBehavior;
 *
 <?php foreach ($relations as $name => $relation): ?>
 <?php if (!in_array($name, $generator->skippedRelations)): ?>
-* @property <?= "\\" .
-    $generator->nsModel .
-    "\\" .
-    $relation[$generator::REL_CLASS] .
-    ($relation[$generator::REL_IS_MULTIPLE] ? "[]" : "") .
-    ' $' .
-    lcfirst($name) .
-    "\n" ?>
+* @property <?= '\\' .
+     $generator->nsModel .
+     '\\' .
+     $relation[$generator::REL_CLASS] .
+     ($relation[$generator::REL_IS_MULTIPLE] ? '[]' : '') .
+     ' $' .
+     lcfirst($name) .
+     "\n" ?>
 <?php endif; ?>
 <?php endforeach; ?>
 <?php endif; ?>
 */
 class <?= $className ?> extends <?= $isTree
      ? '\kartik\tree\models\Tree' . "\n"
-     : "\\" . ltrim($generator->baseModelClass, "\\") . "\n" ?>
+     : '\\' . ltrim($generator->baseModelClass, '\\') . "\n" ?>
 {
-<?= !$isTree ? "    use \\mootensai\\relation\\RelationTrait;\n" : "" ?>
+<?= !$isTree ? "    use \\mootensai\\relation\\RelationTrait;\n" : '' ?>
 
 <?php if ($generator->deletedBy): ?>
 private $_rt_softdelete;
@@ -69,13 +68,9 @@ public function __construct($config = []){
 parent::__construct($config);
 $this->_rt_softdelete = [
 'is_deleted' => 1,
-'<?= $generator->deletedBy ?>' => <?= empty($generator->deletedByValue)
-    ? 1
-    : $generator->deletedByValue ?>,
+'<?= $generator->deletedBy ?>' => <?= empty($generator->deletedByValue) ? 1 : $generator->deletedByValue ?>,
 <?php if ($generator->deletedAt): ?>
-'<?= $generator->deletedAt ?>' => <?= empty($generator->deletedAtValue)
-    ? 1
-    : $generator->deletedAtValue ?>,
+'<?= $generator->deletedAt ?>' => <?= empty($generator->deletedAtValue) ? 1 : $generator->deletedAtValue ?>,
 <?php endif; ?>
 ];
 $this->_rt_softrestore = [
@@ -99,9 +94,7 @@ $this->_rt_softrestore = [
 */
 public function relationNames()
 {
-return [<?= "\n            '" .
-    implode("',\n            '", array_keys($relations)) .
-    "'\n        " ?>];
+return [<?= "\n            '" . implode("',\n            '", array_keys($relations)) . "'\n        " ?>];
 }
 
 <?php endif; ?>
@@ -110,9 +103,7 @@ return [<?= "\n            '" .
 */
 public function rules()
 {
-return [<?= "\n            " .
-    implode(",\n            ", $rules) .
-    "\n        " ?>];
+return [<?= "\n            " . implode(",\n            ", $rules) . "\n        " ?>];
 }
 
 /**
@@ -122,7 +113,7 @@ public static function tableName()
 {
 return '<?= $generator->generateTableName($tableName) ?>';
 }
-<?php if ($generator->db !== "db"): ?>
+<?php if ($generator->db !== 'db'): ?>
 
 /**
 * @return \yii\db\Connection the database connection used by this AR class.
@@ -185,7 +176,7 @@ public function get<?= ucfirst($name) ?>()
 */
 public function behaviors()
 {
-return <?= $isTree ? "array_merge(parent::behaviors(), " : "" ?>[
+return <?= $isTree ? 'array_merge(parent::behaviors(), ' : '' ?>[
 <?php if ($generator->createdAt || $generator->updatedAt): ?>
 'timestamp' => [
 'class' => TimestampBehavior::className(),
@@ -199,10 +190,7 @@ return <?= $isTree ? "array_merge(parent::behaviors(), " : "" ?>[
 <?php else: ?>
 'updatedAtAttribute' => false,
 <?php endif; ?>
-<?php if (
-    !empty($generator->timestampValue) &&
-    $generator->timestampValue != "time()"
-): ?>
+<?php if (!empty($generator->timestampValue) && $generator->timestampValue != 'time()'): ?>
 'value' => <?= $generator->timestampValue ?>,
 <?php endif; ?>
 ],
@@ -220,10 +208,7 @@ return <?= $isTree ? "array_merge(parent::behaviors(), " : "" ?>[
 <?php else: ?>
 'updatedByAttribute' => false,
 <?php endif; ?>
-<?php if (
-    !empty($generator->blameableValue) &&
-    $generator->blameableValue != '\\Yii::$app->user->id'
-): ?>
+<?php if (!empty($generator->blameableValue) && $generator->blameableValue != '\\Yii::$app->user->id'): ?>
 'value' => <?= $generator->blameableValue ?>,
 <?php endif; ?>
 ],
@@ -236,7 +221,7 @@ return <?= $isTree ? "array_merge(parent::behaviors(), " : "" ?>[
 <?php endif; ?>
 ],
 <?php endif; ?>
-]<?= $isTree ? ")" : "" ?>;
+]<?= $isTree ? ')' : '' ?>;
 }
 <?php
 endif; ?>
@@ -250,7 +235,7 @@ self::SCENARIO_DEFAULT => self::OP_ALL,
 
 <?php if ($queryClassName): ?>
 <?php
-$queryClassFullName = "\\" . $generator->queryNs . "\\" . $queryClassName;
+$queryClassFullName = '\\' . $generator->queryNs . '\\' . $queryClassName;
 echo "\n";
 ?>
 <?php if ($generator->deletedBy): ?>

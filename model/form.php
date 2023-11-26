@@ -9,102 +9,107 @@
         <strong>If table contains all the defined columns, the generator will automatically generate model that extends </strong><code>\kartik\tree\models\Tree</code>
     </blockquote>
 <?php
-echo $form->field($generator, "db");
-echo $form->field($generator, "tableName");
-echo $form->field($generator, "enableI18N")->checkbox();
-echo $form->field($generator, "messageCategory");
+echo $form->field($generator, 'db');
+echo $form->field($generator, 'tableName');
+echo $form->field($generator, 'enableI18N')->checkbox();
+echo $form->field($generator, 'messageCategory');
 
-echo $form->field($generator, "nsModel");
-echo $form->field($generator, "modelClass");
-echo $form->field($generator, "baseModelClass");
-echo $form->field($generator, "generateQuery")->checkbox();
-echo $form->field($generator, "queryNs");
-echo $form->field($generator, "queryBaseClass");
+echo $form->field($generator, 'nsModel');
+echo $form->field($generator, 'modelClass');
+echo $form->field($generator, 'baseModelClass');
+echo $form->field($generator, 'generateQuery')->checkbox();
+echo $form->field($generator, 'queryNs');
+echo $form->field($generator, 'queryBaseClass');
 ?>
     <div class="row">
         <div class="col-md-6">
-            <?= $form
-                ->field($generator, "generateLabelsFromComments")
-                ->checkbox() ?>
+            <?= $form->field($generator, 'generateLabelsFromComments')->checkbox(); ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($generator, "useTablePrefix")->checkbox() ?>
+            <?= $form->field($generator, 'useTablePrefix')->checkbox(); ?>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <?php echo $form
-                ->field($generator, "generateRelations")
-                ->dropDownList([
-                    $generator::RELATIONS_NONE => "No relations",
-                    $generator::RELATIONS_ALL => "All relations",
-                    $generator::RELATIONS_ALL_INVERSE =>
-                        "All relations with inverse",
-                ]); ?>
+            <?php
+            echo $form->field($generator, 'generateRelations')->dropDownList([
+                $generator::RELATIONS_NONE => 'No relations',
+                $generator::RELATIONS_ALL => 'All relations',
+                $generator::RELATIONS_ALL_INVERSE => 'All relations with inverse',
+            ]);
+            ?>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <?= $form->field($generator, "skippedRelations") ?>
+            <?= $form->field($generator, 'skippedRelations');?>
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
-            <?= $form
-                ->field($generator, "generateAttributeHints")
-                ->checkbox() ?>
+            <?= $form->field($generator, 'generateAttributeHints')->checkbox(); ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($generator, "generateBaseOnly")->checkbox() ?>
+            <?= $form->field($generator, 'generateBaseOnly')->checkbox(); ?>
         </div>
     </div>
-<?= $form->field($generator, "optimisticLock") ?>
-<?= "<h4>Timestamp Behaviors</h4>" ?>
+<?= $form->field($generator, 'optimisticLock'); ?>
+<?= "<h4>Timestamp Behaviors</h4>"; ?>
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($generator, "createdAt") ?>
+            <?= $form->field($generator, 'createdAt'); ?>
         </div>
         <div class="col-md-3">
-            <?= $form->field($generator, "updatedAt") ?>
+            <?= $form->field($generator, 'updatedAt'); ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($generator, "timestampValue") ?>
+            <?= $form->field($generator, 'timestampValue'); ?>
         </div>
     </div>
-<?php echo "<h4>Blameable Behaviors</h4>"; ?>
+<?php
+echo "<h4>Blameable Behaviors</h4>";
+?>
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($generator, "createdBy") ?>
+            <?= $form->field($generator, 'createdBy'); ?>
         </div>
         <div class="col-md-3">
-            <?= $form->field($generator, "updatedBy") ?>
+            <?= $form->field($generator, 'updatedBy'); ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($generator, "blameableValue") ?>
+            <?= $form->field($generator, 'blameableValue'); ?>
         </div>
     </div>
-<?php echo "<h4>Soft Delete / Restore</h4>"; ?>
+<?php
+echo "<h4>Soft Delete / Restore</h4>";
+?>
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($generator, "deletedBy") ?>
+            <?= $form->field($generator, 'deletedBy'); ?>
         </div>
         <div class="col-md-5">
-            <?= $form->field($generator, "deletedByValue") ?>
+            <?= $form->field($generator, 'deletedByValue'); ?>
         </div>
         <div class="col-md-4">
-            <?= $form->field($generator, "deletedByValueRestored") ?>
+            <?= $form->field($generator, 'deletedByValueRestored'); ?>
         </div>
     </div>
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($generator, "deletedAt") ?>
+            <?= $form->field($generator, 'deletedAt'); ?>
         </div>
         <div class="col-md-5">
-            <?= $form->field($generator, "deletedAtValue") ?>
+            <?= $form->field($generator, 'deletedAtValue'); ?>
         </div>
         <div class="col-md-4">
-            <?= $form->field($generator, "deletedAtValueRestored") ?>
+            <?= $form->field($generator, 'deletedAtValueRestored'); ?>
         </div>
     </div>
-<?php echo "<h4>UUID Behaviors</h4>"; ?>
-<?php echo $form->field($generator, "UUIDColumn"); //echo "<h4>Soft Delete Trait</h4>"; //echo $form->field($generator, 'deletedBy'); //echo $form->field($generator, 'deletedAt');
+<?php
+echo "<h4>UUID Behaviors</h4>";
+?>
+<?php
+echo $form->field($generator, 'UUIDColumn');
+//echo "<h4>Soft Delete Trait</h4>";
+//echo $form->field($generator, 'deletedBy');
+//echo $form->field($generator, 'deletedAt');

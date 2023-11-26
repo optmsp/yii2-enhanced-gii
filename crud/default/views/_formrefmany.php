@@ -6,21 +6,17 @@ use mootensai\enhancedgii\crud\Generator;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 
-$tableSchema = $generator
-    ->getDbConnection()
-    ->getTableSchema($relations[Generator::REL_TABLE]);
+$tableSchema = $generator->getDbConnection()->getTableSchema($relations[Generator::REL_TABLE]);
 $fk = $generator->generateFK($tableSchema);
 $relID = \yii\helpers\Inflector::camel2id($relations[Generator::REL_CLASS]);
 
-$finalName = str_replace(
-    $generator->fieldNameStrip,
-    "",
-    $relations[Generator::REL_CLASS]
-);
+$finalName = str_replace($generator->fieldNameStrip, '', $relations[Generator::REL_CLASS]);
 $humanize = ucwords(Inflector::humanize(Inflector::camel2words($finalName)));
 
 echo "<div class=\"form-group\" id=\"add-$relID\">\n";
 echo "<?php\n";
+
+
 ?>
 
 /**
@@ -45,7 +41,7 @@ $dataProvider = new ArrayDataProvider([
 ]);
 echo TabularForm::widget([
     'dataProvider' => $dataProvider,
-    'formName' => '<?= $relations[Generator::REL_CLASS] ?>',
+    'formName' => '<?= $relations[Generator::REL_CLASS]; ?>',
     'checkboxColumn' => false,
     'actionColumn' => false,
     'attributeDefaults' => [
@@ -54,43 +50,27 @@ echo TabularForm::widget([
     'attributes' => [
 
 <?php
-$className = $relations[Generator::REL_CLASS];
 
-$hiddenFields = ArrayHelper::getValue(
-    $generator->manyRelationsHiddenFieldTweakList,
-    $className,
-    []
-);
-foreach ($hiddenFields as $fieldName => $fieldValueList) {
-    $fieldValue = $fieldValueList[0];
-    echo "        " .
-        "'$fieldName' => ['columnOptions'=>['hidden'=>true],'value' =>" .
-        $fieldValue .
-        "],\n";
-}
+    $className = $relations[Generator::REL_CLASS];
 
-$allowedCols = ArrayHelper::getValue(
-    $generator->manyRelationsEditFieldList,
-    $className,
-    []
-);
-$allColsAllowed = count($allowedCols) ? false : true;
-foreach ($tableSchema->getColumnNames() as $attribute) {
-    $column = $tableSchema->getColumn($attribute);
-    if (
-        !in_array($attribute, $generator->skippedColumns) &&
-        $attribute != $relations[Generator::REL_FOREIGN_KEY] &&
-        ($allColsAllowed || in_array($attribute, $allowedCols))
-    ) {
-        echo "        " .
-            $generator->generateTabularFormField(
-                $attribute,
-                $fk,
-                $tableSchema
-            ) .
-            ",\n";
+    $hiddenFields = ArrayHelper::getValue($generator->manyRelationsHiddenFieldTweakList, $className, array());
+    foreach ($hiddenFields as $fieldName => $fieldValueList) {
+            $fieldValue = $fieldValueList[0];
+            echo "        " . "'$fieldName' => ['columnOptions'=>['hidden'=>true],'value' =>".$fieldValue."],\n";
     }
-}
+
+    $allowedCols = ArrayHelper::getValue($generator->manyRelationsEditFieldList, $className, array());
+    $allColsAllowed = count($allowedCols) ? false : true;
+    foreach ($tableSchema->getColumnNames() as $attribute) {
+        $column = $tableSchema->getColumn($attribute);
+        if (!in_array($attribute, $generator->skippedColumns) &&
+            $attribute != $relations[Generator::REL_FOREIGN_KEY] &&
+            ($allColsAllowed || in_array($attribute, $allowedCols)))
+        {
+            echo "        " . $generator->generateTabularFormField($attribute, $fk, $tableSchema) . ",\n";
+        }
+    }
+
 ?>
 
         'del' => [
@@ -99,13 +79,7 @@ foreach ($tableSchema->getColumnNames() as $attribute) {
             'value' => function($model, $key) {
                 return
                     Html::hiddenInput('Children[' . $key . '][id]', (!empty($model['id'])) ? $model['id'] : "") .
-                    Html::a('<i class="material-icons">delete</i>', '#', ['title' =>  <?= $generator->generateString(
-                        "Delete"
-                    ) ?>, 'onClick' => 'delRow<?= $relations[
-    $generator::REL_CLASS
-] ?>(' . $key . '); return false;', 'id' => '<?= yii\helpers\Inflector::camel2id(
-    $relations[$generator::REL_CLASS]
-) ?>-del-btn']);
+                    Html::a('<i class="material-icons">delete</i>', '#', ['title' =>  <?= $generator->generateString('Delete') ?>, 'onClick' => 'delRow<?= $relations[$generator::REL_CLASS]; ?>(' . $key . '); return false;', 'id' => '<?= yii\helpers\Inflector::camel2id($relations[$generator::REL_CLASS]) ?>-del-btn']);
             },
         ],
     ],
@@ -115,11 +89,7 @@ foreach ($tableSchema->getColumnNames() as $attribute) {
             'type' => GridView::TYPE_DEFAULT,
             'after' => false,
             'footer' => false,
-            'before' => Html::button('<i class="material-icons">add</i>' . <?= $generator->generateString(
-                "Add " . $humanize
-            ) ?>, ['type' => 'button', 'class' => 'btn btn-primary btn-round kv-batch-create', 'onClick' => 'addRow<?= $relations[
-    $generator::REL_CLASS
-] ?>()']),
+            'before' => Html::button('<i class="material-icons">add</i>' . <?= $generator->generateString('Add '.$humanize) ?>, ['type' => 'button', 'class' => 'btn btn-primary btn-round kv-batch-create', 'onClick' => 'addRow<?= $relations[$generator::REL_CLASS]; ?>()']),
         ]
     ]
 ]);

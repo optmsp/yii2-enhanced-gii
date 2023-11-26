@@ -16,21 +16,19 @@ $controllerClass = StringHelper::basename($generator->controllerClass);
 $modelClass = StringHelper::basename($generator->modelClass);
 $searchModelClass = StringHelper::basename($generator->searchModelClass);
 if ($modelClass === $searchModelClass) {
-    $searchModelAlias = $searchModelClass . "Search";
+	$searchModelAlias = $searchModelClass . 'Search';
 }
 $pks = $generator->tableSchema->primaryKey;
 $urlParams = $generator->generateUrlParams();
 $actionParams = $generator->generateActionParams();
 $actionParamComments = $generator->generateActionParamComments();
-$skippedRelations = array_map(function ($value) {
-    return "'$value'";
-}, $generator->skippedRelations);
+$skippedRelations = array_map(function($value){
+	return "'$value'";
+},$generator->skippedRelations);
 echo "<?php\n";
 ?>
 
-namespace <?= StringHelper::dirname(
-    ltrim($generator->controllerClass, "\\")
-) ?>;
+namespace <?= StringHelper::dirname(ltrim($generator->controllerClass, '\\')) ?>;
 
 /**
  * CREATED BY A CODE GENERATOR!!!!
@@ -39,14 +37,13 @@ namespace <?= StringHelper::dirname(
  */
 
 use Yii;
-use <?= ltrim($generator->modelClass, "\\") ?>;
+use <?= ltrim($generator->modelClass, '\\') ?>;
 <?php if (!empty($generator->searchModelClass)): ?>
-use <?= ltrim($generator->searchModelClass, "\\") .
-    (isset($searchModelAlias) ? " as $searchModelAlias" : "") ?>;
-<?php else: ?>
+use <?= ltrim($generator->searchModelClass, '\\') . (isset($searchModelAlias) ? " as $searchModelAlias" : "") ?>;
+<?php else : ?>
 use yii\data\ActiveDataProvider;
 <?php endif; ?>
-use <?= ltrim($generator->baseControllerClass, "\\") ?>;
+use <?= ltrim($generator->baseControllerClass, '\\') ?>;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Inflector;
@@ -56,9 +53,7 @@ use yii\helpers\ArrayHelper;
 /**
  * <?= $controllerClass ?> implements the CRUD actions for <?= $modelClass ?> model.
  */
-class <?= $controllerClass ?> extends <?= StringHelper::basename(
-     $generator->baseControllerClass
- ) . "\n" ?>
+class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->baseControllerClass) . "\n" ?>
 {
 	public function behaviors()
 	{
@@ -70,91 +65,63 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename(
 				],
 			],
 <?php if ($generator->loggedUserOnly):
+  $actions = array();
 
-    $actions = [];
+  if (! $generator->disableIndex) {
+   array_push($actions, "'index'");
+  }
 
-    if (!$generator->disableIndex) {
-        array_push($actions, "'index'");
-    }
+  if (! $generator->disableView) {
+   array_push($actions, "'view'");
+  }
 
-    if (!$generator->disableView) {
-        array_push($actions, "'view'");
-    }
+  if (! $generator->disableUpdate) {
+   array_push($actions, "'update'");
+  }
 
-    if (!$generator->disableUpdate) {
-        array_push($actions, "'update'");
-    }
+  if (! $generator->disableDelete || ! $generator->disableViewDelete) {
+   array_push($actions, "'delete'");
+  }
 
-    if (!$generator->disableDelete || !$generator->disableViewDelete) {
-        array_push($actions, "'delete'");
-    }
+  if (! $generator->disableCreate) {
+   array_push($actions, "'create'");
+  }
 
-    if (!$generator->disableCreate) {
-        array_push($actions, "'create'");
-    }
+	if($generator->pdf){
+		array_push($actions,"'pdf'");
+	}
+	if($generator->saveAsNew){
+		array_push($actions,"'save-as-new'");
+	}
+	foreach ($relations as $name => $rel){
+		if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE]) && !in_array($name, $generator->skippedRelations)){
+			array_push($actions,"'".\yii\helpers\Inflector::camel2id('add'.$rel[Generator::REL_CLASS])."'");
+		}
+	}
+	foreach ($relations as $name => $rel){
+		if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE]) && in_array($name, $generator->manyRelationsAllowedInEdit)){
+			array_push($actions,"'".\yii\helpers\Inflector::camel2id('update'.$rel[Generator::REL_CLASS])."'");
+		}
+	}
+	
+foreach ($generator->editFormDepFieldList as $formDepField => $fromDepFieldDef) {
+		$childField = $formDepField;
+		$defExplode = explode('#', $fromDepFieldDef[0]);
+		$parentField = $defExplode[0];
+		$parentQuery = $defExplode[1];
+		
+		$parentFieldCamel = \yii\helpers\Inflector::camelize($childField);
+		$functionName = $parentFieldCamel . "List";
+		$actions[] = sprintf("'%s'", \yii\helpers\Inflector::camel2id($functionName));
+}
 
-    if ($generator->pdf) {
-        array_push($actions, "'pdf'");
-    }
-    if ($generator->saveAsNew) {
-        array_push($actions, "'save-as-new'");
-    }
-    foreach ($relations as $name => $rel) {
-        if (
-            $rel[Generator::REL_IS_MULTIPLE] &&
-            isset($rel[Generator::REL_TABLE]) &&
-            !in_array($name, $generator->skippedRelations)
-        ) {
-            array_push(
-                $actions,
-                "'" .
-                    \yii\helpers\Inflector::camel2id(
-                        "add" . $rel[Generator::REL_CLASS]
-                    ) .
-                    "'"
-            );
-        }
-    }
-    foreach ($relations as $name => $rel) {
-        if (
-            $rel[Generator::REL_IS_MULTIPLE] &&
-            isset($rel[Generator::REL_TABLE]) &&
-            in_array($name, $generator->manyRelationsAllowedInEdit)
-        ) {
-            array_push(
-                $actions,
-                "'" .
-                    \yii\helpers\Inflector::camel2id(
-                        "update" . $rel[Generator::REL_CLASS]
-                    ) .
-                    "'"
-            );
-        }
-    }
-
-    foreach (
-        $generator->editFormDepFieldList
-        as $formDepField => $fromDepFieldDef
-    ) {
-        $childField = $formDepField;
-        $defExplode = explode("#", $fromDepFieldDef[0]);
-        $parentField = $defExplode[0];
-        $parentQuery = $defExplode[1];
-
-        $parentFieldCamel = \yii\helpers\Inflector::camelize($childField);
-        $functionName = $parentFieldCamel . "List";
-        $actions[] = sprintf(
-            "'%s'",
-            \yii\helpers\Inflector::camel2id($functionName)
-        );
-    }
-    ?>
+?>
 			'access' => [
 				'class' => \yii\filters\AccessControl::className(),
 				'rules' => [
 					[
 						'allow' => true,
-						'actions' => [<?= implode(", ", $actions) ?>],
+						'actions' => [<?= implode(', ',$actions)?>],
 						'roles' => ['@']
 					],
 					[
@@ -162,8 +129,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename(
 					]
 				]
 			]
-<?php
-endif; ?>
+<?php endif; ?>
 		];
 	}
 
@@ -173,18 +139,17 @@ endif; ?>
 	 */
 	public function actionIndex()
 	{
-<?php if (isset($generator->webUserColName)) {
-    $user_col_name = $generator->webUserColName;
-    $queryString =
-        $modelClass .
-        "::find()->andWhere( [ '$user_col_name'=>Yii::\$app->user->id ] )";
-} else {
-    $queryString = $modelClass . "::find()";
-} ?>
+<?php
+   if (isset($generator->webUserColName)) {
+	   $user_col_name = $generator->webUserColName;
+	   $queryString = $modelClass . "::find()->andWhere( [ '$user_col_name'=>Yii::\$app->user->id ] )";
+   }
+   else {
+	   $queryString = $modelClass . "::find()";
+   }
+?>
 <?php if (!empty($generator->searchModelClass)): ?>
-		$searchModel = new <?= isset($searchModelAlias)
-      ? $searchModelAlias
-      : $searchModelClass ?>();
+		$searchModel = new <?= isset($searchModelAlias) ? $searchModelAlias : $searchModelClass ?>();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		$this->showPageNotifications();
@@ -198,7 +163,7 @@ endif; ?>
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 		]);
-<?php else: ?>
+<?php else : ?>
 		$dataProvider = new ActiveDataProvider([
 			'query' => <?= $queryString ?>,
 		]);
@@ -225,12 +190,8 @@ endif; ?>
 	{
 		$model = $this->findModel(<?= $actionParams ?>);
 <?php foreach ($relations as $name => $rel): ?>
-<?php if (
-    $rel[Generator::REL_IS_MULTIPLE] &&
-    isset($rel[Generator::REL_TABLE]) &&
-    !in_array($name, $generator->skippedRelations)
-): ?>
-		$provider<?= $rel[Generator::REL_CLASS] ?> = new \yii\data\ArrayDataProvider([
+<?php if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE]) && !in_array($name, $generator->skippedRelations)): ?>
+		$provider<?= $rel[Generator::REL_CLASS]?> = new \yii\data\ArrayDataProvider([
 			'allModels' => $model-><?= $name ?>,
 			'sort' => [
 			 'attributes' => [ '<?= $generator->getNameAttribute() ?>' ],
@@ -245,39 +206,34 @@ endif; ?>
 		return $this->render('view', [
 			'model' => $this->findModel(<?= $actionParams ?>),
 <?php foreach ($relations as $name => $rel): ?>
-<?php if (
-    $rel[Generator::REL_IS_MULTIPLE] &&
-    isset($rel[Generator::REL_TABLE]) &&
-    !in_array($name, $generator->skippedRelations)
-): ?>
-			'provider<?= $rel[Generator::REL_CLASS] ?>' => $provider<?= $rel[
-    Generator::REL_CLASS
-] ?>,
+<?php if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE]) && !in_array($name, $generator->skippedRelations)): ?>
+			'provider<?= $rel[Generator::REL_CLASS]?>' => $provider<?= $rel[Generator::REL_CLASS]?>,
 <?php endif; ?>
 <?php endforeach; ?>
 		]);
 	}
 
-	<?php /////////// // setup actionCreate() /////////// // create a list of relations to intentionally skip!
+	<?php
+	///////////
+	// setup actionCreate()
+	///////////
+	
+	// create a list of relations to intentionally skip!
+	$excludesList = array();
+	foreach ($relations as $nameToExclude => $rel)
+	{
+	 if (! $rel[Generator::REL_IS_MULTIPLE]) {
+	  continue;
+	 }
 
+	 array_push($excludesList, $nameToExclude);
+	}
 
- $excludesList = [];
- foreach ($relations as $nameToExclude => $rel) {
-     if (!$rel[Generator::REL_IS_MULTIPLE]) {
-         continue;
-     }
-     array_push($excludesList, $nameToExclude);
- }
- $excludeListWithSingle = array_map(function ($value) {
-     return "'$value'";
- }, $excludesList);
- $excludeLoadAll = !empty($excludesList)
-     ? ", [ " . implode(", ", $excludeListWithSingle) . " ]"
-     : "";
- $excludeSaveAll = !empty($excludesList)
-     ? "[ " . implode(", ", $excludeListWithSingle) . " ]"
-     : "";
- ?>
+	$excludeListWithSingle = array_map(function($value) { return "'$value'"; }, $excludesList);
+
+	$excludeLoadAll = (!empty($excludesList) ? ", [ " . implode(", ", $excludeListWithSingle) . " ]" : "");
+	$excludeSaveAll = (!empty($excludesList) ? "[ " . implode(", ", $excludeListWithSingle) . " ]" : "");
+	?>
 
 	/**
 	 * Creates a new <?= $modelClass ?> model.
@@ -288,54 +244,59 @@ endif; ?>
 	{
 		$model = new <?= $modelClass ?>();
 		if (method_exists($model, "prepareForCreate")) {
-			<?php if (isset($generator->webUserColName)): ?>
+			<?php
+			if (isset($generator->webUserColName)):
+			?>
 			$model->prepareForCreate(Yii::$app->user->id, $id);
-			<?php else: ?>
+			<?php
+			else:
+			?>
 			$model->prepareForCreate(null, $id);
-			<?php endif; ?>
+			<?php
+			endif;
+			?>
 		}
 
-			<?php if (isset($generator->webUserColName)) {
-       echo '$model->' .
-           $generator->webUserColName .
-           ' = Yii::$app->user->id;' .
-           "\n";
-   } ?>
+			<?php
+			if (isset($generator->webUserColName)) {
+			  echo '$model->'.$generator->webUserColName.' = Yii::$app->user->id;' . "\n";
+			}
+			?>
 
 		// saveAll() will delete existing related records, so we exclude those for loadAll() and saveAll()
 		if ($model->loadAll(Yii::$app->request->post()<?= $excludeLoadAll ?>) && $model->saveAll(<?= $excludeSaveAll ?>)) {
-			<?php if (isset($generator->webUserColName)) {
-       echo '$model->' .
-           $generator->webUserColName .
-           ' = Yii::$app->user->id;' .
-           "\n";
-   } ?>
+			<?php
+			if (isset($generator->webUserColName)) {
+			  echo '$model->'.$generator->webUserColName.' = Yii::$app->user->id;' . "\n";
+			}
+			?>
 			return $this->redirect( ['view', <?= $urlParams ?>] );
 		} else {
 			return $this->render('create', [ 'model' => $model, ]);
 		}
 	}
 
-	<?php /////////// // setup actionUpdate() /////////// // create a list of relations to intentionally skip!
+	<?php
+	///////////
+	// setup actionUpdate()
+	///////////
+	
+	// create a list of relations to intentionally skip!
+	$excludesList = array();
+	foreach ($relations as $nameToExclude => $rel)
+	{
+	 if (! $rel[Generator::REL_IS_MULTIPLE]) {
+	  continue;
+	 }
 
+	 array_push($excludesList, $nameToExclude);
+	}
 
- $excludesList = [];
- foreach ($relations as $nameToExclude => $rel) {
-     if (!$rel[Generator::REL_IS_MULTIPLE]) {
-         continue;
-     }
-     array_push($excludesList, $nameToExclude);
- }
- $excludeListWithSingle = array_map(function ($value) {
-     return "'$value'";
- }, $excludesList);
- $excludeLoadAll = !empty($excludesList)
-     ? ", [" . implode(", ", $excludeListWithSingle) . "]"
-     : "";
- $excludeSaveAll = !empty($excludesList)
-     ? "[" . implode(", ", $excludeListWithSingle) . "]"
-     : "";
- ?>
+	$excludeListWithSingle = array_map(function($value) { return "'$value'"; }, $excludesList);
+
+	$excludeLoadAll = (!empty($excludesList) ? ", [" . implode(", ", $excludeListWithSingle) . "]" : "");
+	$excludeSaveAll = (!empty($excludesList) ? "[" . implode(", ", $excludeListWithSingle) . "]" : "");
+	?>
 
 	/**
 	 * Updates an existing <?= $modelClass ?> model.
@@ -345,7 +306,7 @@ endif; ?>
 	 */
 	public function actionUpdate(<?= $actionParams ?>)
 	{
-<?php if ($generator->saveAsNew): ?>
+<?php if($generator->saveAsNew) : ?>
 		if (Yii::$app->request->post('_asnew') == '1') {
 			$model = new <?= $modelClass ?>();
 		}else{
@@ -367,43 +328,34 @@ endif; ?>
 	}
 
 <?php foreach ($relations as $name => $rel): ?>
-<?php if (
-    $rel[Generator::REL_IS_MULTIPLE] &&
-    isset($rel[Generator::REL_TABLE]) &&
-    in_array($name, $generator->manyRelationsAllowedInEdit)
-): ?>
-	<?php // create a list of relations to intentionally skip!
-    // create a list of relations to intentionally skip!
-    ?>
- $excludesList = [];
- foreach ($relations as $nameToExclude => $rel) {
-     if ($nameToExclude == $name) {
-         continue;
-     }
-     if (!$rel[Generator::REL_IS_MULTIPLE]) {
-         continue;
-     }
-     array_push($excludesList, $nameToExclude);
- }
- $excludeListWithSingle = array_map(function ($value) {
-     return "'$value'";
- }, $excludesList);
- $excludeLoadAll = !empty($excludesList)
-     ? ", [" . implode(", ", $excludeListWithSingle) . "]"
-     : "";
- $excludeSaveAll = !empty($excludesList)
-     ? "[" . implode(", ", $excludeListWithSingle) . "]"
-     : "";
- ?>
+<?php if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE]) && in_array($name, $generator->manyRelationsAllowedInEdit)): ?>
+	<?php
+	// create a list of relations to intentionally skip!
+	$excludesList = array();
+	foreach ($relations as $nameToExclude => $rel)
+	{
+	 if ($nameToExclude == $name) {
+	  continue;
+	 }
+	 if (! $rel[Generator::REL_IS_MULTIPLE]) {
+	  continue;
+	 }
+
+	 array_push($excludesList, $nameToExclude);
+	}
+
+	$excludeListWithSingle = array_map(function($value) { return "'$value'"; }, $excludesList);
+
+	$excludeLoadAll = (!empty($excludesList) ? ", [" . implode(", ", $excludeListWithSingle) . "]" : "");
+	$excludeSaveAll = (!empty($excludesList) ? "[" . implode(", ", $excludeListWithSingle) . "]" : "");
+	?>
  
 	/**
 	 * Updates a model related to <?= $modelClass ?>. These are in a subform but the form
 	 * returns to this Controller.
 	 * @return mixed
 	 */
-	public function actionUpdate<?= Inflector::camelize(
-     Inflector::singularize($name)
- ) ?>(<?= $actionParams ?>)
+	public function actionUpdate<?= Inflector::camelize(Inflector::singularize($name)) ?>(<?= $actionParams ?>)
 	{
 		$model = $this->findModel(<?= $actionParams ?>);
 
@@ -418,9 +370,7 @@ endif; ?>
 		} else {
 			return $this->render('update', [
 				'model' => $model,
-				'hasManyEditClass' => '<?= Inflector::camelize(
-        Inflector::singularize($name)
-    ) ?>',
+				'hasManyEditClass' => '<?= Inflector::camelize(Inflector::singularize($name)) ?>',
 			]);
 		}
 	}
@@ -428,23 +378,25 @@ endif; ?>
 <?php endforeach; ?>
 
 <?php
-$excludesList = [];
+$excludesList = array();
 foreach ($relations as $name => $rel) {
-    if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE])) {
-        if (!$rel[Generator::REL_IS_MULTIPLE]) {
-            continue;
-        }
-        if (in_array($name, $generator->allowDeleteWithRelatedList)) {
-            continue;
-        }
-        $excludesList[] = $name;
-    }
+ if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE])) {
+
+	 if (! $rel[Generator::REL_IS_MULTIPLE]) {
+	  continue;
+	 }
+
+	 if (in_array($name, $generator->allowDeleteWithRelatedList)) {
+	  continue;
+	 }
+
+	 $excludesList[] = $name;
+ }
 }
-$excludeListWithSingle = array_map(function ($value) {
-    return "'$value'";
-}, $excludesList);
+
+$excludeListWithSingle = array_map(function($value) { return "'$value'"; }, $excludesList);
 $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
-?>
+ ?>
  
 	/**
 	 * Deletes an existing <?= $modelClass ?> model.
@@ -474,7 +426,7 @@ $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
 	}
 
 
-<?php if ($generator->pdf): ?>
+<?php if ($generator->pdf):?>
 	/**
 	 *
 	 * Export <?= $modelClass ?> information into PDF format.
@@ -484,13 +436,9 @@ $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
 	public function actionPdf(<?= $actionParams ?>) {
 		$model = $this->findModel(<?= $actionParams ?>);
 <?php foreach ($relations as $name => $rel): ?>
-<?php if (
-    $rel[Generator::REL_IS_MULTIPLE] &&
-    isset($rel[Generator::REL_TABLE]) &&
-    !in_array($name, $generator->skippedRelations)
-): ?>
+<?php if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE]) && !in_array($name, $generator->skippedRelations)): ?>
 		$provider<?= $rel[Generator::REL_CLASS] ?> = new \yii\data\ArrayDataProvider([
-			'allModels' => $model-><?= $name ?>,
+			'allModels' => $model-><?= $name; ?>,
 		]);
 <?php endif; ?>
 <?php endforeach; ?>
@@ -498,14 +446,8 @@ $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
 		$content = $this->renderAjax('_pdf', [
 			'model' => $model,
 <?php foreach ($relations as $name => $rel): ?>
-<?php if (
-    $rel[Generator::REL_IS_MULTIPLE] &&
-    isset($rel[Generator::REL_TABLE]) &&
-    !in_array($name, $generator->skippedRelations)
-): ?>
-			'provider<?= $rel[Generator::REL_CLASS] ?>' => $provider<?= $rel[
-    Generator::REL_CLASS
-] ?>,
+<?php if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE]) && !in_array($name, $generator->skippedRelations)): ?>
+			'provider<?= $rel[Generator::REL_CLASS]?>' => $provider<?= $rel[Generator::REL_CLASS] ?>,
 <?php endif; ?>
 <?php endforeach; ?>
 		]);
@@ -529,7 +471,7 @@ $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
 	}
 <?php endif; ?>
 
-<?php if ($generator->saveAsNew): ?>
+<?php if($generator->saveAsNew):?>
 	/**
 	* Creates a new <?= $modelClass ?> model by another data,
 	* so user don't need to input all field from scratch.
@@ -538,21 +480,15 @@ $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
 	* @param mixed $id
 	* @return mixed
 	*/
-	public function actionSaveAsNew(<?= $actionParams ?>) {
+	public function actionSaveAsNew(<?= $actionParams; ?>) {
 		$model = new <?= $modelClass ?>();
 
 		if (Yii::$app->request->post('_asnew') != '1') {
-			$model = $this->findModel(<?= $actionParams ?>);
+			$model = $this->findModel(<?= $actionParams; ?>);
 		}
 
 		// saveAll() will delete existing related records, so we exclude those for loadAll() and saveAll()
-		if ($model->loadAll(Yii::$app->request->post()<?= !empty(
-      $generator->skippedRelations
-  )
-      ? ", [" . implode(", ", $skippedRelations) . "]"
-      : "" ?>) && $model->saveAll(<?= !empty($generator->skippedRelations)
-    ? "[" . implode(", ", $skippedRelations) . "]"
-    : "" ?>)) {
+		if ($model->loadAll(Yii::$app->request->post()<?= !empty($generator->skippedRelations) ? ", [".implode(", ", $skippedRelations)."]" : ""; ?>) && $model->saveAll(<?= !empty($generator->skippedRelations) ? "[".implode(", ", $skippedRelations)."]" : ""; ?>)) {
 			return $this->redirect(['view', <?= $urlParams ?>]);
 		} else {
 			return $this->render('saveAsNew', [
@@ -566,42 +502,41 @@ $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
 	 * Finds the <?= $modelClass ?> model based on its primary key value.
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 * <?= implode("\n     * ", $actionParamComments) . "\n" ?>
-	 * @return <?= $modelClass ?> the loaded model
+	 * @return <?=                   $modelClass ?> the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	protected function findModel(<?= $actionParams ?>)
 	{
-<?php if (count($pks) === 1) {
-    if (isset($generator->webUserColName)) {
-        $user_col_name = $generator->webUserColName;
-        $condition = "['id'=>\$id, '$user_col_name'=>Yii::\$app->user->id ]";
-    } else {
-        $condition = '$id';
-    }
+<?php
+if (count($pks) === 1) {
+   if (isset($generator->webUserColName)) {
+	   $user_col_name = $generator->webUserColName;
+	   $condition = "['id'=>\$id, '$user_col_name'=>Yii::\$app->user->id ]";
+   }
+   else {
+	   $condition = '$id';
+   }
 } else {
-    $condition = [];
-    foreach ($pks as $pk) {
-        // xx i don't know how to handle this yet - dp
-        echo "failed!\n";
-        exit();
-        $condition[] = "'$pk' => \$$pk";
-    }
-    $condition = "[" . implode(", ", $condition) . "]";
-} ?>
+	$condition = [];
+	foreach ($pks as $pk) {
+		// xx i don't know how to handle this yet - dp
+		echo "failed!\n";
+		exit();
+		$condition[] = "'$pk' => \$$pk";
+	}
+
+
+	$condition = '[' . implode(', ', $condition) . ']';
+}
+?>
 		if (($model = <?= $modelClass ?>::findOne(<?= $condition ?>)) !== null) {
 			return $model;
 		} else {
-			throw new NotFoundHttpException(<?= $generator->generateString(
-       "The requested page does not exist."
-   ) ?>);
+			throw new NotFoundHttpException(<?= $generator->generateString('The requested page does not exist.')?>);
 		}
 	}
 <?php foreach ($relations as $name => $rel): ?>
-<?php if (
-    $rel[Generator::REL_IS_MULTIPLE] &&
-    isset($rel[Generator::REL_TABLE]) &&
-    !in_array($name, $generator->skippedRelations)
-): ?>
+<?php if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE]) && !in_array($name, $generator->skippedRelations)): ?>
 
 	/**
 	* Action to load a tabular form grid
@@ -621,42 +556,32 @@ $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
 			if((Yii::$app->request->post('isNewRecord') && Yii::$app->request->post('_action') == 'load' && empty($row)) || Yii::$app->request->post('_action') == 'add') {
 			   $row[] = [
 			<?php
-   $className = $rel[Generator::REL_CLASS];
-   $hiddenFields = ArrayHelper::getValue(
-       $generator->manyRelationsHiddenFieldTweakList,
-       $className,
-       []
-   );
-   foreach ($hiddenFields as $fieldName => $fieldValueList) {
-       echo "\t\t'$fieldName' => " . $fieldValueList[0] . ",\n";
-   }
-   ?>
+			   $className = $rel[Generator::REL_CLASS];
+			   $hiddenFields = ArrayHelper::getValue($generator->manyRelationsHiddenFieldTweakList, $className, array());
+			   foreach ($hiddenFields as $fieldName => $fieldValueList) {
+				echo "\t\t'$fieldName' => " . $fieldValueList[0] . ",\n";
+			   }
+			 ?>
 			   ];
 			}
-			return $this->renderAjax('_form<?= $rel[
-       Generator::REL_CLASS
-   ] ?>', ['row' => $row]);
+			return $this->renderAjax('_form<?= $rel[Generator::REL_CLASS] ?>', ['row' => $row]);
 		} else {
-			throw new NotFoundHttpException(<?= $generator->generateString(
-       "The requested page does not exist."
-   ) ?>);
+			throw new NotFoundHttpException(<?= $generator->generateString('The requested page does not exist.')?>);
 		}
 	}
 <?php endif; ?>
 <?php endforeach; ?>
 
-<?php foreach (
-    $generator->editFormDepFieldList
-    as $formDepField => $formDepFieldDef
-) {
-
-    $childField = $formDepField;
-    $defExplode = explode("#", $fromDepFieldDef[0]);
-    $parentField = $defExplode[0];
-    $parentQuery = $defExplode[2];
-    $parentFieldCamel = \yii\helpers\Inflector::camelize($childField);
-    $functionName = $parentFieldCamel . "List";
-    ?>
+<?php
+foreach ($generator->editFormDepFieldList as $formDepField => $formDepFieldDef) {
+		$childField = $formDepField;
+		$defExplode = explode('#', $fromDepFieldDef[0]);
+		$parentField = $defExplode[0];
+		$parentQuery = $defExplode[2];
+		
+		$parentFieldCamel = \yii\helpers\Inflector::camelize($childField);
+		$functionName = $parentFieldCamel . "List";
+?>
 	
 	/**
 	 * Called by our form to get the cild list based on the parent field.
@@ -694,8 +619,9 @@ $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
 		return $result;
 	}
 
-<?php
-} ?>
+<?php	
+}
+?>
 
 	private function showPageNotifications(int $id = null)
 	{

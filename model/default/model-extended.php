@@ -12,7 +12,8 @@
  * @var array $relations list of relations (name => relation declaration)
  */
 
-echo "<?php\n"; ?>
+echo "<?php\n";
+?>
 
 namespace <?= $generator->nsModel ?>;
 

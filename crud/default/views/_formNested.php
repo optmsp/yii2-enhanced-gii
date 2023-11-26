@@ -12,7 +12,7 @@ use mootensai\enhancedgii\crud\Generator;
 
 $tableSchema = $generator->getTableSchema();
 $fk = $generator->generateFK($tableSchema);
-$model = $isTree ? '$node' : '$model';
+$model = ($isTree) ? '$node' : '$model';
 echo "<?php\n";
 ?>
 
@@ -28,29 +28,18 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var <?= $model ?> <?= ltrim($generator->modelClass, "\\") ?> */
+/* @var <?= $model?> <?= ltrim($generator->modelClass, '\\') ?> */
 
 ?>
 
-<div class="<?= Inflector::camel2id(
-    StringHelper::basename($generator->modelClass)
-) ?>-form">
+<div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-form">
 
-<?php foreach ($tableSchema->getColumnNames() as $attribute) {
-    if (
-        !in_array($attribute, $generator->skippedColumns) &&
-        !in_array($attribute, $generator::getTreeColumns())
-    ) {
-        echo "    <?= " .
-            $generator->generateActiveField(
-                $attribute,
-                $fk,
-                null,
-                null,
-                $isTree
-            ) .
-            " ?>\n\n";
+<?php
+foreach ($tableSchema->getColumnNames() as $attribute) {
+    if (!in_array($attribute, $generator->skippedColumns) && !in_array($attribute, $generator::getTreeColumns())) {
+        echo "    <?= " . $generator->generateActiveField($attribute, $fk, null, null, $isTree) . " ?>\n\n";
     }
-} ?>
+}
+?>
 
 </div>

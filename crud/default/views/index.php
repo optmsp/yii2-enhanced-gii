@@ -17,11 +17,7 @@ echo "<?php\n";
 ?>
 
 /* @var $this yii\web\View */
-<?= !empty($generator->searchModelClass)
-    ? "/* @var \$searchModel " .
-        ltrim($generator->searchModelClass, "\\") .
-        " */\n"
-    : "" ?>
+<?= !empty($generator->searchModelClass) ? "/* @var \$searchModel " . ltrim($generator->searchModelClass, '\\') . " */\n" : '' ?>
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 /**
@@ -34,16 +30,10 @@ echo "<?php\n";
 
 use yii\helpers\Html;
 use kartik\export\ExportMenu;
-use <?= $generator->indexWidgetType === "grid"
-    ? "kartik\\grid\\GridView;"
-    : "yii\\widgets\\ListView;" ?>
+use <?= $generator->indexWidgetType === 'grid' ? "kartik\\grid\\GridView;" : "yii\\widgets\\ListView;" ?>
 
 
-$this->title = <?= $generator->pluralize
-    ? $generator->generateString(
-        Inflector::pluralize(Inflector::camel2words($baseModelClass))
-    )
-    : $generator->generateString(Inflector::camel2words($baseModelClass)) ?>;
+$this->title = <?= ($generator->pluralize) ? $generator->generateString(Inflector::pluralize(Inflector::camel2words($baseModelClass))) : $generator->generateString(Inflector::camel2words($baseModelClass)) ?>;
 $this->params['breadcrumbs'][] = $this->title;
 $search = "$('.search-button').click(function(){
 	$('.search-form').toggle(1000);
@@ -61,38 +51,24 @@ $this->registerJs($search);
 
 <div class="card-body">
 
-	<?php if (
-     !empty($generator->searchModelClass) &&
-     !$generator->disableAdvancedSearch
- ): ?>
-	<?= "    <?php " .
-     ($generator->indexWidgetType === "grid"
-         ? "// "
-         : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?php if (!empty($generator->searchModelClass) && ! $generator->disableAdvancedSearch): ?>
+	<?= "    <?php " . ($generator->indexWidgetType === 'grid' ? "// " : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
 	<?php endif; ?>
 
     <p>
-	<?php if (
-     !empty($generator->searchModelClass) &&
-     !$generator->disableAdvancedSearch
- ): ?>
-        <?= "<?= " ?>Html::a(<?= $generator->generateString(
-    "Advance Search"
-) ?>, '#', ['class' => 'btn btn-primary btn-round search-button']) ?>
+	<?php if (!empty($generator->searchModelClass) && ! $generator->disableAdvancedSearch): ?>
+        <?= "<?= " ?>Html::a(<?= $generator->generateString('Advance Search')?>, '#', ['class' => 'btn btn-primary btn-round search-button']) ?>
 	<?php endif; ?>
 
     </p>
 
-	<?php if (
-     !empty($generator->searchModelClass) &&
-     !$generator->disableAdvancedSearch
- ): ?>
+	<?php if (!empty($generator->searchModelClass) && ! $generator->disableAdvancedSearch): ?>
     <div class="search-form" style="display:none">
         <?= "<?= " ?> $this->render('_search', ['model' => $searchModel]); ?>
     </div>
     <?php endif; ?>
 
-	<?php if ($generator->indexWidgetType === "grid"): ?>
+	<?php if ($generator->indexWidgetType === 'grid'): ?>
 	<?= "<?php \n" ?>
 		$gridColumn = [
 			<?php if ($generator->expandable && !empty($fk)): ?>
@@ -111,43 +87,44 @@ $this->registerJs($search);
 			<?php endif; ?>
 			['class' => 'yii\grid\SerialColumn'],
 
-		<?php if ($tableSchema === false):
-      foreach ($generator->getColumnNames() as $name) {
-          $count++;
-          if ($count < 6) {
-              echo "\t\t\t\t\t" . "'" . $name . "'," . "\n";
-          } else {
-              echo "\t\t\t\t\t" . "//'" . $name . "'," . "\n";
-          }
-      }
-  else:
-      foreach ($tableSchema->getColumnNames() as $attribute):
-          if (
-              !in_array($attribute, $generator->skippedColumns) &&
-              !in_array($attribute, $generator->skippedIndexColumns)
-          ): ?>
-				<?= $generator->generateGridViewFieldIndex($attribute, $fk, $tableSchema) ?>
-			<?php endif;
-      endforeach; ?>
+		<?php if ($tableSchema === false) :
+			foreach ($generator->getColumnNames() as $name) {
+				$count++;
+				if ($count < 6) {
+					echo "\t\t\t\t\t" . "'" . $name . "'," . "\n";
+				} else {
+					echo "\t\t\t\t\t" ."//'" . $name . "'," . "\n";
+				}
+			}
+		else :
+			foreach ($tableSchema->getColumnNames() as $attribute):
+				if (!in_array($attribute, $generator->skippedColumns) && !in_array($attribute, $generator->skippedIndexColumns)) :
+		?>
+				<?= $generator->generateGridViewFieldIndex($attribute, $fk, $tableSchema)?>
+			<?php
+				endif;
+			endforeach;
+			?>
 			[
 				'class' => 'yii\grid\ActionColumn',
 				<?php
-    $actionsAllowedList = [];
-    if (!$generator->disableSaveAsNew) {
-        array_push($actionsAllowedList, "{save-as-new}");
-    }
-    if (!$generator->disableView) {
-        array_push($actionsAllowedList, "{view}");
-    }
-    if (!$generator->disableUpdate) {
-        array_push($actionsAllowedList, "{update}");
-    }
-    if (!$generator->disableDelete) {
-        array_push($actionsAllowedList, "{delete}");
-    }
+					$actionsAllowedList = array();
+					if (!$generator->disableSaveAsNew) {
+						array_push($actionsAllowedList, '{save-as-new}');
+					}
+					if (!$generator->disableView) {
+						array_push($actionsAllowedList, '{view}');
+					}
+					if (!$generator->disableUpdate) {
+						array_push($actionsAllowedList, '{update}');
+					}
+					if (!$generator->disableDelete) {
+						array_push($actionsAllowedList, '{delete}');
+					}
 
-    if (count($actionsAllowedList)):
-        $actionTemplate = join(" ", $actionsAllowedList); ?>
+					if (count($actionsAllowedList)):
+						$actionTemplate = join(' ', $actionsAllowedList);
+				?>
 					'template' => '<?= $actionTemplate ?>',
 					'icons' => [
 						'eye-open' => Html::tag('span', 'visibility', ['class' => 'material-icons']),
@@ -161,34 +138,24 @@ $this->registerJs($search);
 							return Html::a('<span class="glyphicon glyphicon-copy"></span>', $url, ['title' => 'Save As New']);
 						},
 					],*/
-				<?php
-    endif;
-    ?>
+				<?php endif; ?>
 			],
 		];
-		<?php
-  endif; ?>
+		<?php endif; ?>
 
     ?>
 
-	<?php $createButton =
-     "Html::a(" .
-     $generator->generateString(
-         "Create " . Inflector::camel2words($baseModelClass)
-     ) .
-     ",['create'], ['class' => 'btn btn-primary btn-round'])"; ?>
+	<?php
+	$createButton = "Html::a(" . $generator->generateString('Create ' . Inflector::camel2words($baseModelClass)) . ",['create'], ['class' => 'btn btn-primary btn-round'])";
+	?>
 
     <?= "<?= " ?>GridView::widget([
         'dataProvider' => $dataProvider,
-        <?= !empty($generator->searchModelClass)
-            ? "'filterModel' => \$searchModel,\n        'columns' => \$gridColumn,\n"
-            : "'columns' => \$gridColumn,\n" ?>
+        <?= !empty($generator->searchModelClass) ? "'filterModel' => \$searchModel,\n        'columns' => \$gridColumn,\n" : "'columns' => \$gridColumn,\n"; ?>
         'pjax' => true,
 		'resizableColumns'=>true,
 		//'persistResize'=>true,
-        'pjaxSettings' => ['options' => ['id' => 'kv-pjax-container-<?= Inflector::camel2id(
-            StringHelper::basename($generator->modelClass)
-        ) ?>']],
+        'pjaxSettings' => ['options' => ['id' => 'kv-pjax-container-<?= Inflector::camel2id(StringHelper::basename($generator->modelClass))?>']],
         'panel' => [
             'type' => GridView::TYPE_PRIMARY,
 			<?= !$generator->disableCreate ? "'before' => $createButton," : null ?>
@@ -196,11 +163,11 @@ $this->registerJs($search);
         ],
 
 
-		<?php if (!$generator->pdf): ?>
+		<?php if(!$generator->pdf) : ?>
 			'export' => false,
 		<?php endif; ?>
 		<?php
-     /*
+		/*
         // your toolbar can include the additional full export menu
         'toolbar' => [
             '{export}',
@@ -224,7 +191,7 @@ $this->registerJs($search);
             ]),
         ],
         */
-     ?>
+		?>
     ]);
 	?>
 

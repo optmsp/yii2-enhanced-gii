@@ -13,12 +13,8 @@ use mootensai\enhancedgii\crud\Generator;
 //print_r($relations);
 
 $urlParams = $generator->generateUrlParams();
-$tableSchema = $generator
-    ->getDbConnection()
-    ->getTableSchema($relations[$generator::REL_TABLE]);
-$pk = empty($tableSchema->primaryKey)
-    ? $tableSchema->getColumnNames()[0]
-    : $tableSchema->primaryKey[0];
+$tableSchema = $generator->getDbConnection()->getTableSchema($relations[$generator::REL_TABLE]);
+$pk = empty($tableSchema->primaryKey) ? $tableSchema->getColumnNames()[0] : $tableSchema->primaryKey[0];
 $fk = $generator->generateFK($tableSchema);
 echo "<?php\n";
 ?>
@@ -36,7 +32,7 @@ use yii\widgets\DetailView;
 use kartik\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $model <?= ltrim($relations[$generator::REL_CLASS], "\\") ?> */
+/* @var $model <?= ltrim($relations[$generator::REL_CLASS], '\\') ?> */
 
 ?>
 <?= "<?php if(!is_null(\$model)): ?>\n" ?>
@@ -44,35 +40,29 @@ use kartik\grid\GridView;
 
     <div class="row">
         <div class="col-lg-9">
-            <h3><?= "<?= " ?>Html::encode($model-><?= $generator->getNameAttributeFK(
-    $relations[$generator::REL_TABLE]
-) ?>) ?></h3>
+            <h3><?= "<?= " ?>Html::encode($model-><?= $generator->getNameAttributeFK($relations[$generator::REL_TABLE]) ?>) ?></h3>
         </div>
     </div>
 
     <div class="row">
     <?= "<?php \n" ?>
         $gridColumn = [
-<?php if ($tableSchema === false) {
-    foreach ($tableSchema->getColumnNames() as $name) {
-        if (++$count < 6) {
-            echo "            '" . $name . "',\n";
-        } else {
-            echo "            // '" . $name . "',\n";
-        }
-    }
-} else {
-    foreach ($tableSchema->getColumnNames() as $attribute) {
-        if (!in_array($attribute, $generator->skippedColumns)) {
-            echo "            " .
-                $generator->generateDetailViewField(
-                    $attribute,
-                    $fk,
-                    $tableSchema
-                );
-        }
-    }
-} ?>
+<?php
+        if ($tableSchema === false) {
+            foreach ($tableSchema->getColumnNames() as $name) {
+                if (++$count < 6) {
+                    echo "            '" . $name . "',\n";
+                } else {
+                    echo "            // '" . $name . "',\n";
+                }
+            }
+        } else{
+            foreach($tableSchema->getColumnNames() as $attribute){
+                if(!in_array($attribute, $generator->skippedColumns)) {
+                    echo "            ".$generator->generateDetailViewField($attribute,$fk, $tableSchema);
+                }
+            }
+        }?>
         ];
         echo DetailView::widget([
             'model' => $model,
@@ -89,9 +79,7 @@ use kartik\grid\GridView;
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-12"><?= $relations[
-            $generator::REL_CLASS
-        ] ?> not set.</div>
+        <div class="col-lg-12"><?= $relations[$generator::REL_CLASS] ?> not set.</div>
     </div>
 </div>
 <?= "<?php endif; ?>\n" ?>

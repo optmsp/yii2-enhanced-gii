@@ -14,11 +14,12 @@ use yii\db\Connection;
 use yii\db\TableSchema;
 use yii\helpers\Inflector;
 
+
 abstract class BaseGenerator extends \yii\gii\Generator
 {
-    const RELATIONS_NONE = "none";
-    const RELATIONS_ALL = "all";
-    const RELATIONS_ALL_INVERSE = "all-inverse";
+    const RELATIONS_NONE = 'none';
+    const RELATIONS_ALL = 'all';
+    const RELATIONS_ALL_INVERSE = 'all-inverse';
 
     // thanks to github.com/iurijacob for simplify the relation array
     const REL_TYPE = 0;
@@ -32,41 +33,20 @@ abstract class BaseGenerator extends \yii\gii\Generator
     const FK_TABLE_NAME = 0;
     const FK_FIELD_NAME = 1;
 
-    public $db = "db";
+    public $db = 'db';
     /* @var $tableSchema TableSchema */
     public $tableSchema;
     public $tableName;
     public $modelClass;
-    public $baseModelClass = "yii\db\ActiveRecord";
-    public $nsModel = "app\models";
-    public $nsSearchModel = "app\models";
+    public $baseModelClass = 'yii\db\ActiveRecord';
+    public $nsModel = 'app\models';
+    public $nsSearchModel = 'app\models';
     public $skippedRelations;
     public $useSchemaName = true;
 
-    public static function getTreeColumns()
-    {
-        return [
-            "id",
-            "root",
-            "lft",
-            "rgt",
-            "lvl",
-            "name",
-            "icon",
-            "icon_type",
-            "active",
-            "selected",
-            "disabled",
-            "readonly",
-            "visible",
-            "collapsed",
-            "movable_u",
-            "movable_d",
-            "movable_l",
-            "movable_r",
-            "removable",
-            "removable_all",
-        ];
+    static public function getTreeColumns(){
+        return ['id', 'root', 'lft', 'rgt', 'lvl', 'name', 'icon', 'icon_type', 'active', 'selected', 'disabled', 'readonly',
+            'visible', 'collapsed', 'movable_u', 'movable_d', 'movable_l', 'movable_r', 'removable', 'removable_all'];
     }
 
     /**
@@ -77,7 +57,7 @@ abstract class BaseGenerator extends \yii\gii\Generator
         $db = $this->getDbConnection();
         if ($db !== null) {
             return [
-                "tableName" => function () use ($db) {
+                'tableName' => function () use ($db) {
                     return $db->getSchema()->getTableNames();
                 },
             ];
@@ -92,15 +72,9 @@ abstract class BaseGenerator extends \yii\gii\Generator
     public function validateDb()
     {
         if (!Yii::$app->has($this->db)) {
-            $this->addError(
-                "db",
-                'There is no application component named "db".'
-            );
+            $this->addError('db', 'There is no application component named "db".');
         } elseif (!Yii::$app->get($this->db) instanceof Connection) {
-            $this->addError(
-                "db",
-                'The "db" application component must be a DB connection instance.'
-            );
+            $this->addError('db', 'The "db" application component must be a DB connection instance.');
         }
     }
 
@@ -109,31 +83,19 @@ abstract class BaseGenerator extends \yii\gii\Generator
      */
     public function validateTableName()
     {
-        if (
-            strpos($this->tableName, "*") !== false &&
-            substr_compare($this->tableName, "*", -1, 1)
-        ) {
-            $this->addError(
-                "tableName",
-                "Asterisk is only allowed as the last character."
-            );
+        if (strpos($this->tableName, '*') !== false && substr_compare($this->tableName, '*', -1, 1)) {
+            $this->addError('tableName', 'Asterisk is only allowed as the last character.');
 
             return;
         }
         $tables = $this->getTableNames();
         if (empty($tables)) {
-            $this->addError(
-                "tableName",
-                "Table '{$this->tableName}' does not exist."
-            );
+            $this->addError('tableName', "Table '{$this->tableName}' does not exist.");
         } else {
             foreach ($tables as $table) {
                 $class = $this->generateClassName($table);
                 if ($this->isReservedKeyword($class)) {
-                    $this->addError(
-                        "tableName",
-                        "Table '$table' will generate a class which is a reserved PHP keyword."
-                    );
+                    $this->addError('tableName', "Table '$table' will generate a class which is a reserved PHP keyword.");
                     break;
                 }
             }
@@ -147,24 +109,21 @@ abstract class BaseGenerator extends \yii\gii\Generator
     {
         $pk = $this->tableSchema->primaryKey;
         if (empty($pk)) {
-            $this->addError(
-                "modelClass",
-                "The table associated with $this->modelClass must have primary key(s)."
-            );
+            $this->addError('modelClass', "The table associated with $this->modelClass must have primary key(s).");
         }
     }
 
-    //    public function isModelExist()
-    //    {
-    //        $class = $this->modelClass;
-    //        try {
-    //            if (!class_exists($class)) {
-    //                return false;
-    //            }
-    //        } catch (\Exception $e) {
-    //            return false;
-    //        }
-    //    }
+//    public function isModelExist()
+//    {
+//        $class = $this->modelClass;
+//        try {
+//            if (!class_exists($class)) {
+//                return false;
+//            }
+//        } catch (\Exception $e) {
+//            return false;
+//        }
+//    }
 
     /**
      * Checks if the given table is a junction table.
@@ -207,8 +166,7 @@ abstract class BaseGenerator extends \yii\gii\Generator
     {
         $db = $this->getDbConnection();
         $schema = $db->getSchema();
-        if ($schema->hasMethod("getSchemaNames")) {
-            // keep BC to Yii versions < 2.0.4
+        if ($schema->hasMethod('getSchemaNames')) { // keep BC to Yii versions < 2.0.4
             try {
                 $schemaNames = $schema->getSchemaNames();
             } catch (NotSupportedException $e) {
@@ -216,10 +174,10 @@ abstract class BaseGenerator extends \yii\gii\Generator
             }
         }
         if (!isset($schemaNames)) {
-            if (($pos = strpos($this->tableName, ".")) !== false) {
+            if (($pos = strpos($this->tableName, '.')) !== false) {
                 $schemaNames = [substr($this->tableName, 0, $pos)];
             } else {
-                $schemaNames = [""];
+                $schemaNames = [''];
             }
         }
         return $schemaNames;
@@ -253,12 +211,7 @@ abstract class BaseGenerator extends \yii\gii\Generator
 
                     // Add relation for this table
                     $link = $this->generateRelationLink(array_flip($refs));
-                    $relationName = $this->generateRelationName(
-                        $relations,
-                        $table,
-                        $fks[0],
-                        false
-                    );
+                    $relationName = $this->generateRelationName($relations, $table, $fks[0], false);
                     $relFK = key($refs);
                     $relations[$table->fullName][lcfirst($relationName)] = [
                         self::REL_TYPE => "return \$this->hasOne(\\{$this->nsModel}\\$refClassName::className(), $link);", // relation type
@@ -267,41 +220,21 @@ abstract class BaseGenerator extends \yii\gii\Generator
                         self::REL_TABLE => $refTable, //related table
                         self::REL_PRIMARY_KEY => $refs[$relFK], // related primary key
                         self::REL_FOREIGN_KEY => $relFK, // this foreign key
-                        self::REL_IS_MASTER => in_array(
-                            $relFK,
-                            $table->getColumnNames()
-                        )
-                            ? 1
-                            : 0,
+                        self::REL_IS_MASTER => in_array($relFK, $table->getColumnNames()) ? 1 : 0
                     ];
 
                     // Add relation for the referenced table
                     $hasMany = $this->isHasManyRelation($table, $fks);
                     $link = $this->generateRelationLink($refs);
-                    $relationName = $this->generateRelationName(
-                        $relations,
-                        $refTableSchema,
-                        $className,
-                        $hasMany
-                    );
-                    $relations[$refTableSchema->fullName][
-                        lcfirst($relationName)
-                    ] = [
-                        self::REL_TYPE =>
-                            "return \$this->" .
-                            ($hasMany ? "hasMany" : "hasOne") .
-                            "(\\{$this->nsModel}\\$className::className(), $link);", // rel type
+                    $relationName = $this->generateRelationName($relations, $refTableSchema, $className, $hasMany);
+                    $relations[$refTableSchema->fullName][lcfirst($relationName)] = [
+                        self::REL_TYPE => "return \$this->" . ($hasMany ? 'hasMany' : 'hasOne') . "(\\{$this->nsModel}\\$className::className(), $link);", // rel type
                         self::REL_CLASS => $className, //rel class
                         self::REL_IS_MULTIPLE => $hasMany, //is multiple
                         self::REL_TABLE => $table->fullName, // rel table
                         self::REL_PRIMARY_KEY => $refs[key($refs)], // rel primary key
                         self::REL_FOREIGN_KEY => key($refs), // this foreign key
-                        self::REL_IS_MASTER => in_array(
-                            $relFK,
-                            $refTableSchema->getColumnNames()
-                        )
-                            ? 1
-                            : 0,
+                        self::REL_IS_MASTER => in_array($relFK, $refTableSchema->getColumnNames()) ? 1 : 0
                     ];
                 }
 
@@ -309,11 +242,7 @@ abstract class BaseGenerator extends \yii\gii\Generator
                     continue;
                 }
 
-                $relations = $this->generateManyManyRelations(
-                    $table,
-                    $junctionFks,
-                    $relations
-                );
+                $relations = $this->generateManyManyRelations($table, $junctionFks, $relations);
             }
         }
 
@@ -336,24 +265,12 @@ abstract class BaseGenerator extends \yii\gii\Generator
     {
         $uniqueKeys = [$table->primaryKey];
         try {
-            $uniqueKeys = array_merge(
-                $uniqueKeys,
-                $this->getDbConnection()
-                    ->getSchema()
-                    ->findUniqueIndexes($table)
-            );
+            $uniqueKeys = array_merge($uniqueKeys, $this->getDbConnection()->getSchema()->findUniqueIndexes($table));
         } catch (NotSupportedException $e) {
             // ignore
         }
         foreach ($uniqueKeys as $uniqueKey) {
-            if (
-                count(
-                    array_diff(
-                        array_merge($uniqueKey, $fks),
-                        array_intersect($uniqueKey, $fks)
-                    )
-                ) === 0
-            ) {
+            if (count(array_diff(array_merge($uniqueKey, $fks), array_intersect($uniqueKey, $fks))) === 0) {
                 return false;
             }
         }
@@ -371,27 +288,15 @@ abstract class BaseGenerator extends \yii\gii\Generator
     {
         $relationNames = [];
         foreach ($this->getSchemaNames() as $schemaName) {
-            foreach (
-                $this->getDbConnection()
-                    ->getSchema()
-                    ->getTableSchemas($schemaName)
-                as $table
-            ) {
+            foreach ($this->getDbConnection()->getSchema()->getTableSchemas($schemaName) as $table) {
                 $className = $this->generateClassName($table->fullName);
                 foreach ($table->foreignKeys as $refs) {
                     $refTable = $refs[0];
-                    $refTableSchema = $this->getDbConnection()->getTableSchema(
-                        $refTable
-                    );
+                    $refTableSchema = $this->getDbConnection()->getTableSchema($refTable);
                     unset($refs[0]);
                     $fks = array_keys($refs);
 
-                    $leftRelationName = $this->generateRelationName(
-                        $relationNames,
-                        $table,
-                        $fks[0],
-                        false
-                    );
+                    $leftRelationName = $this->generateRelationName($relationNames, $table, $fks[0], false);
                     $relationNames[$table->fullName][$leftRelationName] = true;
                     $hasMany = $this->isHasManyRelation($table, $fks);
                     $rightRelationName = $this->generateRelationName(
@@ -400,30 +305,14 @@ abstract class BaseGenerator extends \yii\gii\Generator
                         $className,
                         $hasMany
                     );
-                    $relationNames[$refTableSchema->fullName][
-                        $rightRelationName
-                    ] = true;
+                    $relationNames[$refTableSchema->fullName][$rightRelationName] = true;
 
                     $relations[$table->fullName][$leftRelationName][0] =
-                        rtrim(
-                            $relations[$table->fullName][$leftRelationName][0],
-                            ";"
-                        ) .
-                        "->inverseOf('" .
-                        lcfirst($rightRelationName) .
-                        "');";
-                    $relations[$refTableSchema->fullName][
-                        $rightRelationName
-                    ][0] =
-                        rtrim(
-                            $relations[$refTableSchema->fullName][
-                                $rightRelationName
-                            ][0],
-                            ";"
-                        ) .
-                        "->inverseOf('" .
-                        lcfirst($leftRelationName) .
-                        "');";
+                        rtrim($relations[$table->fullName][$leftRelationName][0], ';')
+                        . "->inverseOf('".lcfirst($rightRelationName)."');";
+                    $relations[$refTableSchema->fullName][$rightRelationName][0] =
+                        rtrim($relations[$refTableSchema->fullName][$rightRelationName][0], ';')
+                        . "->inverseOf('".lcfirst($leftRelationName)."');";
                 }
             }
         }
@@ -448,42 +337,22 @@ abstract class BaseGenerator extends \yii\gii\Generator
         $table0Schema = $db->getTableSchema($table0);
         $table1Schema = $db->getTableSchema($table1);
 
-        $link = $this->generateRelationLink([
-            $fks[$table->primaryKey[1]][1] => $table->primaryKey[1],
-        ]);
-        $viaLink = $this->generateRelationLink([
-            $table->primaryKey[0] => $fks[$table->primaryKey[0]][1],
-        ]);
-        $relationName = $this->generateRelationName(
-            $relations,
-            $table0Schema,
-            $table->primaryKey[1],
-            true
-        );
+        $link = $this->generateRelationLink([$fks[$table->primaryKey[1]][1] => $table->primaryKey[1]]);
+        $viaLink = $this->generateRelationLink([$table->primaryKey[0] => $fks[$table->primaryKey[0]][1]]);
+        $relationName = $this->generateRelationName($relations, $table0Schema, $table->primaryKey[1], true);
         $relations[$table0Schema->fullName][$relationName] = [
-            "return \$this->hasMany(\\{$this->nsModel}\\$className1::className(), $link)->viaTable('" .
-            $this->generateTableName($table->name) .
-            "', $viaLink);",
+            "return \$this->hasMany(\\{$this->nsModel}\\$className1::className(), $link)->viaTable('"
+            . $this->generateTableName($table->name) . "', $viaLink);",
             $className1,
             true,
         ];
 
-        $link = $this->generateRelationLink([
-            $fks[$table->primaryKey[0]][1] => $table->primaryKey[0],
-        ]);
-        $viaLink = $this->generateRelationLink([
-            $table->primaryKey[1] => $fks[$table->primaryKey[1]][1],
-        ]);
-        $relationName = $this->generateRelationName(
-            $relations,
-            $table1Schema,
-            $table->primaryKey[0],
-            true
-        );
+        $link = $this->generateRelationLink([$fks[$table->primaryKey[0]][1] => $table->primaryKey[0]]);
+        $viaLink = $this->generateRelationLink([$table->primaryKey[1] => $fks[$table->primaryKey[1]][1]]);
+        $relationName = $this->generateRelationName($relations, $table1Schema, $table->primaryKey[0], true);
         $relations[$table1Schema->fullName][$relationName] = [
-            "return \$this->hasMany(\\{$this->nsModel}\\$className0::className(), $link)->viaTable('" .
-            $this->generateTableName($table->name) .
-            "', $viaLink);",
+            "return \$this->hasMany(\\{$this->nsModel}\\$className0::className(), $link)->viaTable('"
+            . $this->generateTableName($table->name) . "', $viaLink);",
             $className0,
             true,
         ];
@@ -503,7 +372,7 @@ abstract class BaseGenerator extends \yii\gii\Generator
             $pairs[] = "'$a' => '$b'";
         }
 
-        return "[" . implode(", ", $pairs) . "]";
+        return '[' . implode(', ', $pairs) . ']';
     }
 
     /**
@@ -518,14 +387,11 @@ abstract class BaseGenerator extends \yii\gii\Generator
             return $this->classNames[$tableName];
         }
 
-        $schemaName = "";
+        $schemaName = '';
         $fullTableName = $tableName;
-        if (($pos = strrpos($tableName, ".")) !== false) {
-            if (
-                ($useSchemaName === null && $this->useSchemaName) ||
-                $useSchemaName
-            ) {
-                $schemaName = substr($tableName, 0, $pos) . "_";
+        if (($pos = strrpos($tableName, '.')) !== false) {
+            if (($useSchemaName === null && $this->useSchemaName) || $useSchemaName) {
+                $schemaName = substr($tableName, 0, $pos) . '_';
             }
             $tableName = substr($tableName, $pos + 1);
         }
@@ -534,12 +400,12 @@ abstract class BaseGenerator extends \yii\gii\Generator
         $patterns = [];
         $patterns[] = "/^{$db->tablePrefix}(.*?)$/";
         $patterns[] = "/^(.*?){$db->tablePrefix}$/";
-        if (strpos($this->tableName, "*") !== false) {
+        if (strpos($this->tableName, '*') !== false) {
             $pattern = $this->tableName;
-            if (($pos = strrpos($pattern, ".")) !== false) {
+            if (($pos = strrpos($pattern, '.')) !== false) {
                 $pattern = substr($pattern, $pos + 1);
             }
-            $patterns[] = "/^" . str_replace("*", "(\w+)", $pattern) . '$/';
+            $patterns[] = '/^' . str_replace('*', '(\w+)', $pattern) . '$/';
         }
         $className = $tableName;
         foreach ($patterns as $pattern) {
@@ -548,10 +414,7 @@ abstract class BaseGenerator extends \yii\gii\Generator
                 break;
             }
         }
-        return $this->classNames[$fullTableName] = Inflector::id2camel(
-            $schemaName . $className,
-            "_"
-        );
+        return $this->classNames[$fullTableName] = Inflector::id2camel($schemaName . $className, '_');
     }
 
     /**
@@ -564,40 +427,32 @@ abstract class BaseGenerator extends \yii\gii\Generator
      */
     protected function generateRelationName($relations, $table, $key, $multiple)
     {
-        //        print_r($key);
+//        print_r($key);
         static $baseModel;
         if ($baseModel === null && isset($this->baseClass)) {
             $baseClass = $this->baseClass;
             $baseModel = new $baseClass();
         }
 
-        if (
-            !empty($key) &&
-            substr_compare($key, "id", -2, 2, true) === 0 &&
-            strcasecmp($key, "id")
-        ) {
-            $key = rtrim(substr($key, 0, -2), "_");
-        } elseif (
-            !empty($key) &&
-            substr_compare($key, "id", 0, 2, true) === 0 &&
-            strcasecmp($key, "id")
-        ) {
-            $key = ltrim(substr($key, 2, strlen($key)), "_");
+        if (!empty($key) && substr_compare($key, 'id', -2, 2, true) === 0 && strcasecmp($key, 'id')) {
+            $key = rtrim(substr($key, 0, -2), '_');
+        } else if (!empty($key) && substr_compare($key, 'id', 0, 2, true) === 0 && strcasecmp($key, 'id')) {
+            $key = ltrim(substr($key, 2, strlen($key)), '_');
         }
 
         if ($multiple) {
             $key = Inflector::pluralize($key);
         }
-        $name = $rawName = Inflector::id2camel($key, "_");
+        $name = $rawName = Inflector::id2camel($key, '_');
         $i = 0;
         while (isset($baseModel) && $baseModel->hasProperty(lcfirst($name))) {
-            $name = $rawName . $i++;
+            $name = $rawName . ($i++);
         }
         while (isset($table->columns[lcfirst($name)])) {
-            $name = $rawName . $i++;
+            $name = $rawName . ($i++);
         }
         while (isset($relations[$table->fullName][$name])) {
-            $name = $rawName . $i++;
+            $name = $rawName . ($i++);
         }
         return lcfirst($name);
     }
@@ -631,32 +486,21 @@ abstract class BaseGenerator extends \yii\gii\Generator
             return [];
         }
         $tableNames = [];
-        if (strpos($this->tableName, "*") !== false) {
-            if (($pos = strrpos($this->tableName, ".")) !== false) {
+        if (strpos($this->tableName, '*') !== false) {
+            if (($pos = strrpos($this->tableName, '.')) !== false) {
                 $schema = substr($this->tableName, 0, $pos);
-                $pattern =
-                    "/^" .
-                    str_replace(
-                        "*",
-                        "\w+",
-                        substr($this->tableName, $pos + 1)
-                    ) .
-                    '$/';
+                $pattern = '/^' . str_replace('*', '\w+', substr($this->tableName, $pos + 1)) . '$/';
             } else {
-                $schema = "";
-                $pattern =
-                    "/^" . str_replace("*", "\w+", $this->tableName) . '$/';
+                $schema = '';
+                $pattern = '/^' . str_replace('*', '\w+', $this->tableName) . '$/';
             }
 
             foreach ($db->schema->getTableNames($schema) as $table) {
                 if (preg_match($pattern, $table)) {
-                    $tableNames[] =
-                        $schema === "" ? $table : $schema . "." . $table;
+                    $tableNames[] = $schema === '' ? $table : ($schema . '.' . $table);
                 }
             }
-        } elseif (
-            ($table = $db->getTableSchema($this->tableName, true)) !== null
-        ) {
+        } elseif (($table = $db->getTableSchema($this->tableName, true)) !== null) {
             $tableNames[] = $this->tableName;
             $this->classNames[$this->tableName] = $this->modelClass;
         }
@@ -686,11 +530,9 @@ abstract class BaseGenerator extends \yii\gii\Generator
 
         $db = $this->getDbConnection();
         if (preg_match("/^{$db->tablePrefix}(.*?)$/", $tableName, $matches)) {
-            $tableName = "{{%" . $matches[1] . "}}";
-        } elseif (
-            preg_match("/^(.*?){$db->tablePrefix}$/", $tableName, $matches)
-        ) {
-            $tableName = "{{" . $matches[1] . "%}}";
+            $tableName = '{{%' . $matches[1] . '}}';
+        } elseif (preg_match("/^(.*?){$db->tablePrefix}$/", $tableName, $matches)) {
+            $tableName = '{{' . $matches[1] . '%}}';
         }
         return $tableName;
     }

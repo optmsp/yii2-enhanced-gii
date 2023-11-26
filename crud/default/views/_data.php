@@ -7,6 +7,7 @@ use mootensai\enhancedgii\crud\Generator;
 
 use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
+
 ?>
 <?= "<?php" ?>
 
@@ -23,23 +24,15 @@ use kartik\tabs\TabsX;
 use yii\helpers\Url;
 $items = [
     [
-        'label' => '<i class="glyphicon glyphicon-user"></i> '. Html::encode(<?= $generator->generateString(
-            Inflector::camel2words($rel[Generator::REL_CLASS])
-        ) ?>),
+        'label' => '<i class="glyphicon glyphicon-user"></i> '. Html::encode(<?= $generator->generateString(Inflector::camel2words($rel[Generator::REL_CLASS])) ?>),
         'content' => $this->render('_view', [
             'all' => false,
         ]),
     ],
 <?php foreach ($relations as $name => $rel): ?>
-    <?php if (
-        $rel[Generator::REL_IS_MULTIPLE] &&
-        isset($rel[Generator::REL_TABLE]) &&
-        !in_array($name, $generator->skippedRelations)
-    ): ?>
+    <?php if ($rel[Generator::REL_IS_MULTIPLE] && isset($rel[Generator::REL_TABLE]) && !in_array($name, $generator->skippedRelations)): ?>
     [
-        'label' => '<i class="glyphicon glyphicon-user"></i> '. Html::encode(<?= $generator->generateString(
-            Inflector::camel2words($rel[Generator::REL_CLASS])
-        ) ?>),
+        'label' => '<i class="glyphicon glyphicon-user"></i> '. Html::encode(<?= $generator->generateString(Inflector::camel2words($rel[Generator::REL_CLASS])) ?>),
         'content' => $this->render('_data<?= $rel[Generator::REL_CLASS] ?>', [
             'model' => $model,
             'row' => $model-><?= $name ?>,
@@ -76,4 +69,3 @@ echo TabsX::widget([
     ],
 ]);
 ?>
- ?>

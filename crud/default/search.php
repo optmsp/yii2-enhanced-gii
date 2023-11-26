@@ -1,9 +1,10 @@
 <?php
 /**
- * This is the template for generating CRUD search class of the specified model.
- */
+     * This is the template for generating CRUD search class of the specified model.
+     */
 
 use yii\helpers\StringHelper;
+
 
 /* @var $this yii\web\View */
 /* @var $generator \mootensai\enhancedgii\model\Generator */
@@ -11,7 +12,7 @@ use yii\helpers\StringHelper;
 $modelClass = StringHelper::basename($generator->modelClass);
 
 if ($modelClass === $generator->searchModelClass) {
-    $modelAlias = $modelClass . "Model";
+    $modelAlias = $modelClass . 'Model';
 }
 $rules = $generator->generateSearchRules();
 $labels = $generator->generateSearchLabels();
@@ -26,15 +27,12 @@ namespace <?= $generator->nsSearchModel ?>;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use <?= ltrim($generator->nsModel . "\\" . $modelClass, "\\") .
-    (isset($modelAlias) ? " as $modelAlias" : "") ?>;
+use <?= ltrim($generator->nsModel . '\\' . $modelClass, '\\') . (isset($modelAlias) ? " as $modelAlias" : "") ?>;
 
 /**
  * <?= $generator->searchModelClass ?> represents the model behind the search form about `<?= $generator->modelClass ?>`.
  */
- class <?= StringHelper::basename(
-     $generator->searchModelClass
- ) ?> extends <?= isset($modelAlias) ? $modelAlias : $modelClass ?>
+ class <?= StringHelper::basename($generator->searchModelClass) ?> extends <?= isset($modelAlias) ? $modelAlias : $modelClass ?>
 
 {
     /**
@@ -66,11 +64,13 @@ use <?= ltrim($generator->nsModel . "\\" . $modelClass, "\\") .
     public function search($params)
     {
         $query = <?= isset($modelAlias) ? $modelAlias : $modelClass ?>::find();
-        <?php if (isset($generator->webUserColName)) {
-            $user_col_name = $generator->webUserColName;
-            $where = "['$user_col_name'=>Yii::\$app->user->id]";
-            echo "\$query->andWhere($where);\n";
-        } ?>
+        <?php
+          if (isset($generator->webUserColName)) {
+               $user_col_name = $generator->webUserColName;
+               $where = "['$user_col_name'=>Yii::\$app->user->id]";
+               echo "\$query->andWhere($where);\n";
+          }
+        ?>
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

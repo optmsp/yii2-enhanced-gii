@@ -23,36 +23,23 @@ use kartik\tabs\TabsX;
 use yii\helpers\Url;
 $items = [
     [
-        'label' => '<i class="material-icons">auto_stories</i> '. Html::encode(<?= $generator->generateString(
-            StringHelper::basename($generator->modelClass)
-        ) ?>),
+        'label' => '<i class="material-icons">auto_stories</i> '. Html::encode(<?= $generator->generateString(StringHelper::basename($generator->modelClass)) ?>),
         'content' => $this->render('_detail', [
             'model' => $model,
         ]),
     ],
 <?php foreach ($relations as $name => $rel): ?>
-    <?php if (
-        $rel[2] &&
-        isset($rel[3]) &&
-        !in_array($name, $generator->skippedRelations)
-    ): ?>
+    <?php if ($rel[2] && isset($rel[3]) && !in_array($name, $generator->skippedRelations)): ?>
     [
-        'label' => '<i class="material-icons">view_list</i> '. Html::encode(<?= $generator->generateString(
-            Inflector::pluralize(Inflector::camel2words($rel[1]))
-        ) ?>),
+        'label' => '<i class="material-icons">view_list</i> '. Html::encode(<?= $generator->generateString(Inflector::pluralize(Inflector::camel2words($rel[1]))) ?>),
         'content' => $this->render('_data<?= $rel[1] ?>', [
             'model' => $model,
             'row' => $model-><?= $name ?>,
         ]),
     ],
-    <?php elseif (
-        isset($rel[$generator::REL_IS_MASTER]) &&
-        !$rel[$generator::REL_IS_MASTER]
-    ): ?>
+    <?php elseif(isset($rel[$generator::REL_IS_MASTER]) && !$rel[$generator::REL_IS_MASTER]): ?>
     [
-        'label' => '<i class="material-icons">view_list</i> '. Html::encode(<?= $generator->generateString(
-            Inflector::camel2words($rel[1])
-        ) ?>),
+        'label' => '<i class="material-icons">view_list</i> '. Html::encode(<?= $generator->generateString(Inflector::camel2words($rel[1])) ?>),
         'content' => $this->render('_data<?= $rel[1] ?>', [
         'model' => $model-><?= $name ?>
         ]),
@@ -72,4 +59,3 @@ echo TabsX::widget([
     ],
 ]);
 ?>
- ?>
