@@ -59,7 +59,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
 	{
 		return [
 			'verbs' => [
-				'class' => VerbFilter::className(),
+				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['post', 'get'],
 				],
@@ -103,13 +103,13 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
 			array_push($actions,"'".\yii\helpers\Inflector::camel2id('update'.$rel[Generator::REL_CLASS])."'");
 		}
 	}
-	
+
 foreach ($generator->editFormDepFieldList as $formDepField => $fromDepFieldDef) {
 		$childField = $formDepField;
 		$defExplode = explode('#', $fromDepFieldDef[0]);
 		$parentField = $defExplode[0];
 		$parentQuery = $defExplode[1];
-		
+
 		$parentFieldCamel = \yii\helpers\Inflector::camelize($childField);
 		$functionName = $parentFieldCamel . "List";
 		$actions[] = sprintf("'%s'", \yii\helpers\Inflector::camel2id($functionName));
@@ -117,7 +117,7 @@ foreach ($generator->editFormDepFieldList as $formDepField => $fromDepFieldDef) 
 
 ?>
 			'access' => [
-				'class' => \yii\filters\AccessControl::className(),
+				'class' => \yii\filters\AccessControl::class,
 				'rules' => [
 					[
 						'allow' => true,
@@ -153,7 +153,7 @@ foreach ($generator->editFormDepFieldList as $formDepField => $fromDepFieldDef) 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 		$this->showPageNotifications();
-		
+
 		//prevents bootstrap css from loading again on pjax, which was causing font changes #100
 		Yii::$app->assetManager->bundles = [
             'yii\bootstrap4\BootstrapAsset' => false
@@ -169,7 +169,7 @@ foreach ($generator->editFormDepFieldList as $formDepField => $fromDepFieldDef) 
 		]);
 
 		$this->showPageNotifications();
-		
+
 		//prevents bootstrap css from loading again on pjax, which was causing font changes #100
 		Yii::$app->assetManager->bundles = [
             'yii\bootstrap4\BootstrapAsset' => false
@@ -217,7 +217,7 @@ foreach ($generator->editFormDepFieldList as $formDepField => $fromDepFieldDef) 
 	///////////
 	// setup actionCreate()
 	///////////
-	
+
 	// create a list of relations to intentionally skip!
 	$excludesList = array();
 	foreach ($relations as $nameToExclude => $rel)
@@ -280,7 +280,7 @@ foreach ($generator->editFormDepFieldList as $formDepField => $fromDepFieldDef) 
 	///////////
 	// setup actionUpdate()
 	///////////
-	
+
 	// create a list of relations to intentionally skip!
 	$excludesList = array();
 	foreach ($relations as $nameToExclude => $rel)
@@ -349,7 +349,7 @@ foreach ($generator->editFormDepFieldList as $formDepField => $fromDepFieldDef) 
 	$excludeLoadAll = (!empty($excludesList) ? ", [" . implode(", ", $excludeListWithSingle) . "]" : "");
 	$excludeSaveAll = (!empty($excludesList) ? "[" . implode(", ", $excludeListWithSingle) . "]" : "");
 	?>
- 
+
 	/**
 	 * Updates a model related to <?= $modelClass ?>. These are in a subform but the form
 	 * returns to this Controller.
@@ -397,7 +397,7 @@ foreach ($relations as $name => $rel) {
 $excludeListWithSingle = array_map(function($value) { return "'$value'"; }, $excludesList);
 $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
  ?>
- 
+
 	/**
 	 * Deletes an existing <?= $modelClass ?> model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -407,7 +407,7 @@ $deleteExcludes = "[ " . implode(", ", $excludeListWithSingle) . " ]";
 	public function actionDelete($id)
 	{
 		$model = $this->findModel(<?= $actionParams ?>);
-		
+
 		// the model will tell us if it can be deleted. if not, that's usually because
 		// there are other records that depend on this one and the User can't just delete
 		// it without handling the other related items first
@@ -578,18 +578,18 @@ foreach ($generator->editFormDepFieldList as $formDepField => $formDepFieldDef) 
 		$defExplode = explode('#', $fromDepFieldDef[0]);
 		$parentField = $defExplode[0];
 		$parentQuery = $defExplode[2];
-		
+
 		$parentFieldCamel = \yii\helpers\Inflector::camelize($childField);
 		$functionName = $parentFieldCamel . "List";
 ?>
-	
+
 	/**
 	 * Called by our form to get the cild list based on the parent field.
 	 */
 	public function action<?= $functionName ?>()
 	{
 		Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-		
+
 		$out = [];
 		if (isset($_POST['depdrop_parents'])) {
 			$parents = $_POST['depdrop_parents'];
@@ -599,15 +599,15 @@ foreach ($generator->editFormDepFieldList as $formDepField => $formDepFieldDef) 
 				return ['output'=>$out, 'selected'=>''];
 			}
 		}
-		
+
 		return ['output'=>'', 'selected'=>''];
 	}
-	
+
 	private function get<?= $functionName ?>(int $parentID)
 	{
 		$user = \common\models\User::findOne(Yii::$app->user->id);
 		dassert(isset($user));
-		
+
 		$result = array();
 		$childQuery = $<?= $parentQuery ?>;
 		foreach ($childQuery->all() as $childItem) {
@@ -619,7 +619,7 @@ foreach ($generator->editFormDepFieldList as $formDepField => $formDepFieldDef) 
 		return $result;
 	}
 
-<?php	
+<?php
 }
 ?>
 

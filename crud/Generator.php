@@ -39,7 +39,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
     public $generateSearchModel;
     public $disableAdvancedSearch = false;
     public $searchModelClass;
-    
+
     public $editFormDepFields;
     public $editFormDepFieldList;
 
@@ -58,7 +58,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
     public $generateLabelsFromComments = false;
     public $useTablePrefix = false;
     public $generateRelations = true;
-    
+
     public $detailViewFormatCode;
     public $detailViewValueCode;
     public $detailViewFormatCodeList;
@@ -158,8 +158,8 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
             [['tableName'], 'validateTableName'],
 //            [['searchModelClass'], 'compare', 'compareAttribute' => 'modelClass', 'operator' => '!==', 'message' => 'Search Model Class must not be equal to Model Class.'],
             [['modelClass', 'baseControllerClass', 'searchModelClass', 'db', 'queryClass'], 'match', 'pattern' => '/^[\w\\\\]*$/', 'message' => 'Only word characters and backslashes are allowed.'],
-//            [['modelClass'], 'validateClass', 'params' => ['extends' => BaseActiveRecord::className()]],
-            [['baseControllerClass'], 'validateClass', 'params' => ['extends' => Controller::className()]],
+//            [['modelClass'], 'validateClass', 'params' => ['extends' => BaseActiveRecord::class]],
+            [['baseControllerClass'], 'validateClass', 'params' => ['extends' => Controller::class]],
             [['db'], 'validateDb'],
             [['controllerClass'], 'match', 'pattern' => '/Controller$/', 'message' => 'Controller class name must be suffixed with "Controller".'],
             [['controllerClass'], 'match', 'pattern' => '/(^|\\\\)[A-Z][^\\\\]+Controller$/', 'message' => 'Controller class name must start with an uppercase letter.'],
@@ -419,7 +419,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
 
         $this->allowDeleteWithRelatedList = ($this->allowDeleteWithRelated) ? explode(',', str_replace(' ', '', $this->allowDeleteWithRelated)) : [$this->allowDeleteWithRelated];
         $this->allowDeleteWithRelatedList = array_filter($this->allowDeleteWithRelatedList);
-        
+
         $this->detailViewFormatCodeList = $this->explodeCmdLineParameter($this->detailViewFormatCode, 2);
         $this->detailViewValueCodeList = $this->explodeCmdLineParameter($this->detailViewValueCode, 2, '!', '#', '?');
 
@@ -437,7 +437,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
         $this->skippedRelations = array_filter($this->skippedRelations);
         $this->manyRelationsAllowedInEdit = array_filter($this->manyRelationsAllowedInEdit);
         $this->manyRelationsAllowedInView = array_filter($this->manyRelationsAllowedInView);
-        
+
         $this->editFormDepFieldList = $this->explodeCmdLineParameter($this->editFormDepFields, 2);
 
         if (isset($this->webUserColName) && ! strlen($this->webUserColName)) {
@@ -725,7 +725,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
             else {
                 $valueLine = null;
             }
-            
+
             $output = "
                 [
                     'attribute' => '$rel[7].$labelCol',
@@ -948,13 +948,13 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
             //]
             [
                 'type'=>TabularForm::INPUT_WIDGET,
-                'widgetClass'=>\kartik\widgets\SwitchInput::classname(),
+                'widgetClass'=>\kartik\widgets\SwitchInput::class,
             ]";
         } elseif ($column->type === 'text' || $column->dbType === 'tinytext') {
             return "'$attribute' => ['type' => TabularForm::INPUT_TEXTAREA]";
         } elseif ($column->dbType === 'date') {
             return "'$attribute' => ['type' => TabularForm::INPUT_WIDGET,
-            'widgetClass' => \\kartik\\datecontrol\\DateControl::classname(),
+            'widgetClass' => \\kartik\\datecontrol\\DateControl::class,
             'options' => [
                 'type' => \\kartik\\datecontrol\\DateControl::FORMAT_DATE,
                 'saveFormat' => 'php:Y-m-d',
@@ -971,7 +971,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
         ]";
         } elseif ($column->dbType === 'time') {
             return "'$attribute' => ['type' => TabularForm::INPUT_WIDGET,
-            'widgetClass' => \\kartik\\datecontrol\\DateControl::classname(),
+            'widgetClass' => \\kartik\\datecontrol\\DateControl::class,
             'options' => [
                 'type' => \\kartik\\datecontrol\\DateControl::FORMAT_TIME,
                 'saveFormat' => 'php:H:i:s',
@@ -988,7 +988,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
         ]";
         } elseif ($column->dbType === 'datetime') {
             return "'$attribute' => ['type' => TabularForm::INPUT_WIDGET,
-            'widgetClass' => \\kartik\\datecontrol\\DateControl::classname(),
+            'widgetClass' => \\kartik\\datecontrol\\DateControl::class,
             'options' => [
                 'type' => \\kartik\\datecontrol\\DateControl::FORMAT_DATETIME,
                 'saveFormat' => 'php:Y-m-d H:i:s',
@@ -1041,7 +1041,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
             $output = "'$attribute' => [
                 'label' => '$humanize',
                 'type' => TabularForm::INPUT_WIDGET,
-                'widgetClass' => \\kartik\\widgets\\Select2::className(),
+                'widgetClass' => \\kartik\\widgets\\Select2::class,
                 'options' => [
                     'data' => \\yii\\helpers\\ArrayHelper::map($fkClassFQ::find()->" . $webUserColNameText . $tweakFilter ."asArray()->all(), '{$rel[self::REL_PRIMARY_KEY]}', '$labelCol'),
                     'options' => ['placeholder' => '--INPUT--'],
@@ -1117,11 +1117,11 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
         }
         if ($column->phpType === 'boolean' || $column->dbType === 'tinyint(1)') {
             //return "\$form->field($model, '$attribute')->checkbox()";
-            return "\$form->field($model, '$attribute')->widget(\\kartik\\widgets\\SwitchInput::className(), [])";
+            return "\$form->field($model, '$attribute')->widget(\\kartik\\widgets\\SwitchInput::class, [])";
         } elseif ($column->type === 'text' || $column->dbType === 'tinytext') {
             return "\$form->field($model, '$attribute')->textarea(['rows' => 6])";
         } elseif ($column->dbType === 'date') {
-            return "\$form->field($model, '$attribute')->widget(\\kartik\\datecontrol\\DateControl::classname(), [
+            return "\$form->field($model, '$attribute')->widget(\\kartik\\datecontrol\\DateControl::class, [
         'type' => \\kartik\\datecontrol\\DateControl::FORMAT_DATE,
         'saveFormat' => 'php:Y-m-d',
         'ajaxConversion' => true,
@@ -1134,7 +1134,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
         ],
     ]);";
         } elseif ($column->dbType === 'time') {
-            return "\$form->field($model, '$attribute')->widget(\\kartik\\datecontrol\\DateControl::className(), [
+            return "\$form->field($model, '$attribute')->widget(\\kartik\\datecontrol\\DateControl::class, [
                 'type' => \\kartik\\datecontrol\\DateControl::FORMAT_TIME,
                 'saveFormat' => 'php:H:i:s',
                 'ajaxConversion' => true,
@@ -1147,7 +1147,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
                 ]
             ]);";
         } elseif ($column->dbType === 'datetime') {
-            return "\$form->field($model, '$attribute')->widget(\\kartik\\datecontrol\\DateControl::classname(), [
+            return "\$form->field($model, '$attribute')->widget(\\kartik\\datecontrol\\DateControl::class, [
         'type' => \\kartik\\datecontrol\\DateControl::FORMAT_DATETIME,
         'saveFormat' => 'php:Y-m-d H:i:s',
         'ajaxConversion' => true,
@@ -1200,21 +1200,21 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
 
             if (array_key_exists($attribute, $this->editFormDepFieldList)) {
                 //$parentAttrName = $this->editFormDepFieldList[$attribute][0];
-                
-                
+
+
                 $childField = $attribute;
 
                 $fromDepFieldDef = $this->editFormDepFieldList[$attribute];
                 $defExplode = explode('#', $fromDepFieldDef[0]);
                 $parentField = $defExplode[0];
                 $parentQuery = $defExplode[1];
-                
+
                 $childFieldFinalName = sprintf("\$%s_list", $childField);
                 $fieldParentFieldID = "field_$parentField";
-                
+
                 $controllerActionName = \yii\helpers\Inflector::camel2id($attribute) . "-list";
-                
-                $output = "\$form->field($model, '$attribute')->widget(\\kartik\\widgets\\DepDrop::classname(), [
+
+                $output = "\$form->field($model, '$attribute')->widget(\\kartik\\widgets\\DepDrop::class, [
                     'data'=> $childFieldFinalName,
                     'type' => \kartik\depdrop\DepDrop::TYPE_SELECT2,
                     'options' => [
@@ -1230,7 +1230,7 @@ class Generator extends \mootensai\enhancedgii\BaseGenerator
                 ]);";
             }
             else {
-                $output = "\$form->field($model, '$attribute')->widget(\\kartik\\widgets\\Select2::classname(), [
+                $output = "\$form->field($model, '$attribute')->widget(\\kartik\\widgets\\Select2::class, [
                     'data' => \\yii\\helpers\\ArrayHelper::map($fkClassFQ::find()->". $webUserColNameText . $tweakFilter . "asArray()->all(), '$rel[4]', '$labelCol'),
                     'options' => [
                         'placeholder' => '--INPUT--',
